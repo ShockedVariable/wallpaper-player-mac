@@ -121,6 +121,7 @@ class GlobalSettingsViewModel: ObservableObject {
     var didActivateApplicationNotificationCancellable: Cancellable?
     var didCurrentWallpaperChangeCancellable: Cancellable?
     var didAddToLoginItemCancellable: Cancellable?
+    var didChangeScreenParametersNotificationCancellable: Cancellable?
     
     init() {
         if let data = UserDefaults.standard.data(forKey: "GlobalSettings"),
@@ -141,12 +142,17 @@ class GlobalSettingsViewModel: ObservableObject {
         didFinishLaunchingNotificationCancellable?.cancel()
         didCurrentWallpaperChangeCancellable?.cancel()
         didAddToLoginItemCancellable?.cancel()
+        didChangeScreenParametersNotificationCancellable?.cancel()
     }
     
     func didFinishLaunchingNotification() {
         self.didActivateApplicationNotificationCancellable =
-        NotificationCenter.default.publisher(for: NSWorkspace.didActivateApplicationNotification)
+        NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didActivateApplicationNotification)
             .sink { [weak self] _ in self?.activateApplicationDidChange() }
+        
+        self.didChangeScreenParametersNotificationCancellable =
+        NotificationCenter.default.publisher(for: NSApplication.didChangeScreenParametersNotification)
+            .sink { [weak self] _ in self?.didChangeScreenParameters() }
         
         self.didCurrentWallpaperChangeCancellable =
         AppDelegate.shared.wallpaperViewModel.$currentWallpaper
@@ -160,6 +166,10 @@ class GlobalSettingsViewModel: ObservableObject {
             
         
         self.validate()
+    }
+    
+    func didChangeScreenParameters() {
+        AppDelegate.shared.wallpaperWindow.setFrame(NSScreen.main!.wallpaperFrame, display: true)
     }
     
     func didAddToLoginItem(_ added: Bool) {
@@ -271,5 +281,16 @@ class GlobalSettingsViewModel: ObservableObject {
     private func saveAndValidate() {
         save()
         validate()
+    }
+}
+
+extension NSScreen {
+    var wallpaperFrame: NSRect {
+        get {
+            NSRect(origin: .zero,
+                   size: CGSize(width: self.visibleFrame.size.width,
+                                height: self.visibleFrame.size.height + self.visibleFrame.origin.y + 1)
+            )
+        }
     }
 }
