@@ -170,6 +170,8 @@ class GlobalSettingsViewModel: ObservableObject {
     
     func didChangeScreenParameters() {
         AppDelegate.shared.wallpaperWindow.setFrame(NSScreen.main!.wallpaperFrame, display: true)
+        
+        logger.info("\(NSScreen.screens.map { $0 == NSScreen.main! })")
     }
     
     func didAddToLoginItem(_ added: Bool) {
@@ -292,5 +294,36 @@ extension NSScreen {
                                 height: self.visibleFrame.size.height + self.visibleFrame.origin.y + 1)
             )
         }
+    }
+    
+    /// The product information about  for the screen.
+    var displayDescription: GSDisplayIdentifier? {
+        get {
+            GSDisplayIdentifier(id: self.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as! CGDirectDisplayID)
+        }
+    }
+}
+
+struct GSDisplayIdentifier: Codable, Equatable {
+    var vendor: UInt32
+    var model: UInt32
+    var serial: UInt32
+    
+    init?(id: CGDirectDisplayID) {
+        let vendor = CGDisplayVendorNumber(id)
+        let model = CGDisplayModelNumber(id)
+        let serial = CGDisplaySerialNumber(id)
+        
+        // Check if all the fields are valid
+        guard vendor != 0xFFFFFFFF,
+              model != 0xFFFFFFFF,
+              model != kDisplayProductIDGeneric,
+              serial != 0xFFFFFFFF else { return nil }
+        
+        self.vendor = vendor
+        self.model = model
+        self.serial = serial
+        
+        logger.debug("New Display Identifier Initialized! [vendor: \(vendor), model: \(model), serial: \(serial)]")
     }
 }
