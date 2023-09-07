@@ -6,6 +6,9 @@
 //
 
 import Cocoa
+import os
+
+let logger = Logger()
 
 NSApplication.shared.delegate = AppDelegate.shared
 NSApplication.shared.run()
