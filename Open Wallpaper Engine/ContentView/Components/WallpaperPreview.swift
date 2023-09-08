@@ -47,6 +47,8 @@ struct WallpaperPreview: SubviewOfContentView {
                         }(wallpaperViewModel.currentWallpaper.wallpaperDirectory))
                             .resizable()
                             .aspectRatio(contentMode: .fit)
+                            .background(Color(nsColor: NSColor.controlBackgroundColor))
+                            .clipShape(RoundedRectangle(cornerRadius: 16.0))
                             .frame(width: 280, height: 280)
                         HStack {
                             if isEditingId == "title" {
@@ -250,6 +252,14 @@ struct WallpaperPreview: SubviewOfContentView {
                         .disabled(true)
                     }
                 }
+                .blur(radius: wallpaperViewModel.currentWallpaper.project == .invalid ? 16.0 : 0)
+                .overlay {
+                    if wallpaperViewModel.currentWallpaper.project == .invalid {
+                        Text("Please select a valid wallpaper")
+                    }
+                }
+                .disabled(wallpaperViewModel.currentWallpaper.project == .invalid ? true : false)
+                .animation(.default, value: wallpaperViewModel.currentWallpaper.project)
                 .padding([.horizontal, .top])
             }
 

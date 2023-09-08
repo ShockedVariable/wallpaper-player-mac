@@ -84,6 +84,26 @@ struct ContentView: View {
                 }
             }
         }
+        .confirmationDialog("Unsubscribe Confirmation",
+                            isPresented: $viewModel.isUnsubscribeConfirming) {
+            if let url = viewModel.hoveredWallpaper?.wallpaperDirectory {
+                Button("Delete Immediately", role: .destructive) {
+                    try? FileManager.default.removeItem(at: url)
+                    if url == wallpaperViewModel.currentWallpaper.wallpaperDirectory {
+                        wallpaperViewModel.currentWallpaper = WEWallpaper(using: .invalid, where: Bundle.main.url(forResource: "WallpaperNotFound", withExtension: "mp4")!)
+                    }
+                }
+                Button("Move to Trash") {
+                    try? FileManager.default.trashItem(at: url, resultingItemURL: nil)
+                    if url == wallpaperViewModel.currentWallpaper.wallpaperDirectory {
+                        wallpaperViewModel.currentWallpaper = WEWallpaper(using: .invalid, where: Bundle.main.url(forResource: "WallpaperNotFound", withExtension: "mp4")!)
+                    }
+                }
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("\(viewModel.hoveredWallpaper?.project.title ?? "invalid wallpaper")")
+        }
         .alert(isPresented: $viewModel.importAlertPresented, error: viewModel.importAlertError) {
             
         }
@@ -100,7 +120,7 @@ struct ContentView: View {
             UnsafeWallpaper(wallpaper: wallpaperViewModel.nextCurrentWallpaper)
                 .frame(width: 600, height: 300)
         }
-        .frame(minWidth: 1000, minHeight: 400, idealHeight: 600)
+        .frame(minWidth: 1000, minHeight: 640, idealHeight: 800)
     }
 }
 

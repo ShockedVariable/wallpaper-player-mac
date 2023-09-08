@@ -49,6 +49,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         AppDelegate.shared.setEventHandler()
     }
     
+    func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
+        var dockMenu = self.statusItem.menu?.copy() as! NSMenu?
+        dockMenu?.items.removeLast() // Remove `Quit` menu item
+        return dockMenu
+    }
+    
 // MARK: - delegate methods
     func applicationDidFinishLaunching(_ notification: Notification) {
         saveCurrentWallpaper()
@@ -56,6 +62,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         
         // 显示桌面壁纸
         self.wallpaperWindow.orderFront(nil)
+        
+        if globalSettingsViewModel.isFirstLaunch {
+            self.mainWindowController.window.center()
+            self.mainWindowController.window.makeKeyAndOrderFront(nil)
+        }
     }
     
     func applicationDidBecomeActive(_ notification: Notification) {
