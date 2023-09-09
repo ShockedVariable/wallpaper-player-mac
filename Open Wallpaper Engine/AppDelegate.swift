@@ -8,40 +8,28 @@
 import Cocoa
 import SwiftUI
 import AVKit
+import WebKit
 
-extension NSMenuItem {
-    public convenience init(title: String, systemImage: String, action: Selector?, keyEquivalent: String) {
-        self.init(title: title, action: action, keyEquivalent: keyEquivalent)
-        self.image = NSImage(systemSymbolName: systemImage, accessibilityDescription: nil)
-        
-    }
-}
-
-class AppDelegate: NSObject, NSApplicationDelegate, NSToolbarDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     var statusItem: NSStatusItem!
-    var mainWindow: NSWindow!
     var settingsWindow: NSWindow!
+    
+    var mainWindowController: MainWindowController!
     
     var wallpaperWindow: NSWindow!
     
-    var contentViewModel: ContentViewModel!
-    var wallpaperViewModel: WallpaperViewModel!
-    var globalSettingsViewModel: GlobalSettingsViewModel!
+    var contentViewModel = ContentViewModel()
+    var wallpaperViewModel = WallpaperViewModel()
+    var globalSettingsViewModel = GlobalSettingsViewModel()
     
     var importOpenPanel: NSOpenPanel!
     
+    var eventHandler: Any?
+    
     static var shared = AppDelegate()
     
-// MARK: - delegate methods
-    func applicationDidFinishLaunching(_ notification: Notification) {
-        contentViewModel = ContentViewModel()
-        wallpaperViewModel = WallpaperViewModel()
-        globalSettingsViewModel = GlobalSettingsViewModel()
-        
-        // 创建主视窗
-        setMainWindow()
-        
+    func applicationWillFinishLaunching(_ notification: Notification) {
         // 创建设置视窗
         setSettingsWindow()
         
@@ -54,12 +42,25 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSToolbarDelegate {
         // 创建化右上角常驻菜单栏
         setStatusMenu()
         
+        // 创建主视窗
+        self.mainWindowController = MainWindowController()
+        
+        // 将外部输入传递到壁纸窗口
+        AppDelegate.shared.setEventHandler()
+    }
+    
+// MARK: - delegate methods
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        saveCurrentWallpaper()
+        AppDelegate.shared.setPlacehoderWallpaper(with: wallpaperViewModel.currentWallpaper)
+        
         // 显示桌面壁纸
-        self.wallpaperWindow.center()
         self.wallpaperWindow.orderFront(nil)
         
-        // 显示主视窗
-        self.mainWindow.makeKeyAndOrderFront(nil)
+        if globalSettingsViewModel.isFirstLaunch {
+            self.mainWindowController.window.center()
+            self.mainWindowController.window.makeKeyAndOrderFront(nil)
+        }
     }
     
     func applicationDidBecomeActive(_ notification: Notification) {
@@ -67,11 +68,31 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSToolbarDelegate {
     }
     
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        if !mainWindow.isVisible && !settingsWindow.isVisible {
-            self.mainWindow.makeKeyAndOrderFront(nil)
+        if !self.mainWindowController.window.isVisible && !settingsWindow.isVisible {
+            self.mainWindowController.window?.makeKeyAndOrderFront(nil)
         }
         
         return true
+    }
+    
+    func applicationWillTerminate(_ notification: Notification) {
+        if let wallpaper = UserDefaults.standard.url(forKey: "OSWallpaper") {
+            try? NSWorkspace.shared.setDesktopImageURL(wallpaper, for: .main!)
+        }
+        
+        let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+        do {
+            let filesURL = try FileManager.default.contentsOfDirectory(at: cacheDirectory,
+                                                                       includingPropertiesForKeys: nil,
+                                                                       options: .skipsHiddenFiles)
+            for url in filesURL {
+                if url.lastPathComponent.contains("staticWP") {
+                    try FileManager.default.removeItem(at: url)
+                }
+            }
+        } catch {
+            print(error)
+        }
     }
     
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
@@ -80,157 +101,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSToolbarDelegate {
 
 // MARK: - misc methods
     @objc func openSettingsWindow() {
+        NSApp.activate(ignoringOtherApps: true)
         self.settingsWindow.center()
         self.settingsWindow.makeKeyAndOrderFront(nil)
     }
     
     @objc func openMainWindow() {
-        self.mainWindow.makeKeyAndOrderFront(nil)
+        self.mainWindowController.window?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
-    }
-    
-    @objc func pause() {
-        (self.wallpaperWindow.contentViewController as? WallpaperViewController)?.pause()
-    }
-    
-    @objc func openImportPanel(_ allowsMultipleSelection: Bool = false) {
-        let panel = NSOpenPanel()
-        panel.canChooseFiles = false
-        panel.canChooseDirectories = true
-        panel.allowsMultipleSelection = allowsMultipleSelection
-        
-        self.importOpenPanel = panel
-        self.importOpenPanel.beginSheetModal(for: self.mainWindow) { response in
-            print(String(describing: self.importOpenPanel.urls))
-            DispatchQueue.main.async {
-                self.contentViewModel.wallpaperUrls.append(contentsOf: self.importOpenPanel.urls)
-            }
-        }
     }
     
     @MainActor @objc func toggleFilter() {
         self.contentViewModel.isFilterReveal.toggle()
-    }
-    
-// MARK: - Set Main Menu
-    func setMainMenu() {
-        // 主菜单
-        let appMenu = NSMenuItem()
-        appMenu.submenu = NSMenu(title: "Open Wallpaper Engine")
-        appMenu.submenu?.items = [
-            // 在此处添加子菜单项
-            .init(title: "Settings...", action: #selector(openSettingsWindow), keyEquivalent: ","),
-            .separator(),
-            .init(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"),
-            .separator(),
-            .init(title: "Hide", action: #selector(NSApplication.hide(_:)), keyEquivalent: "h"),
-            {
-                let item = NSMenuItem(title: "Hide Others", action: #selector(NSApplication.hideOtherApplications(_:)), keyEquivalent: "h")
-                item.keyEquivalentModifierMask = [.command, .option]
-                return item
-            }()
-        ]
-        
-        // 导入子菜单
-        let importMenu = NSMenuItem(title: "Import", action: nil, keyEquivalent: "")
-        importMenu.submenu = NSMenu()
-        importMenu.submenu?.items = [
-            .init(title: "Wallpaper from Folder", action: #selector(openImportPanel), keyEquivalent: "i"),
-            .init(title: "Wallpapers in Folder", action: nil, keyEquivalent: "")
-        ]
-        
-        // 文件菜单
-        let fileMenu = NSMenuItem()
-        fileMenu.submenu = NSMenu(title: "File")
-        fileMenu.submenu?.items = [
-            // 在此处添加子菜单项
-            importMenu,
-            .separator(),
-            .init(title: "Close Window", action: #selector(NSApplication.shared.keyWindow?.close), keyEquivalent: "w")
-        ]
-        
-        // 查看菜单
-        let viewMenu = NSMenuItem()
-        viewMenu.submenu = NSMenu(title: "View")
-        viewMenu.submenu?.items = [
-            {
-                let item = NSMenuItem(title: "Show Filter Results", action: #selector(self.toggleFilter), keyEquivalent: "s")
-                item.keyEquivalentModifierMask = [.command, .control]
-                return item
-            }()
-        ]
-        
-        // 窗口菜单
-        let windowMenu = NSMenuItem()
-        windowMenu.submenu = NSMenu(title: "Window")
-        windowMenu.submenu?.items = [
-            {
-                let item = NSMenuItem(title: "Wallpaper Explorer", action: #selector(openMainWindow), keyEquivalent: "1")
-                item.keyEquivalentModifierMask = [.command, .shift]
-                return item
-            }()
-        ]
-        
-        // 帮助菜单
-        let helpMenu = NSMenuItem()
-        helpMenu.submenu = NSMenu(title: "Help")
-        helpMenu.submenu?.items = [
-            
-        ]
-        
-        // 主菜单栏
-        let mainMenu = NSMenu()
-        mainMenu.items = [
-            appMenu,
-            fileMenu,
-            viewMenu,
-            windowMenu,
-            helpMenu
-        ]
-        
-        NSApplication.shared.mainMenu = mainMenu
-    }
-
-// MARK: Set Status Menu
-    func setStatusMenu() {
-        let menu = NSMenu()
-        menu.items = [
-            .init(title: "Show Open Wallpaper Engine", systemImage: "photo", action: #selector(openMainWindow), keyEquivalent: ""),
-            .init(title: "Recent Wallpapers", systemImage: "", action: nil, keyEquivalent: ""),
-            .init(title: "Change Screensaver", systemImage: "moon.stars", action: nil, keyEquivalent: ""),
-            .separator(),
-            .init(title: "Browse Workshop", systemImage: "globe", action: nil, keyEquivalent: ""),
-            .init(title: "Create Wallpaper", systemImage: "pencil.and.ruler.fill", action: nil, keyEquivalent: ""),
-            .init(title: "Settings", systemImage: "gearshape.fill", action: #selector(openSettingsWindow), keyEquivalent: ""),
-            .separator(),
-            .init(title: "Support & FAQ", systemImage: "person.fill.questionmark", action: nil, keyEquivalent: ""),
-            .separator(),
-            .init(title: "Take Screenshot", systemImage: "camera.fill", action: nil, keyEquivalent: ""),
-            .init(title: "Mute", systemImage: "speaker.slash.fill", action: nil, keyEquivalent: ""),
-            .init(title: "Pause", systemImage: "pause.fill", action: #selector(pause), keyEquivalent: ""),
-            .init(title: "Quit", systemImage: "power", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
-        ]
-        
-        self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        self.statusItem.menu = menu
-        
-        if let button = self.statusItem.button {
-            button.image = NSImage(systemSymbolName: "play.desktopcomputer", accessibilityDescription: nil)
-        }
-    }
-    
-// MARK: Set Main Window
-    func setMainWindow() {
-        self.mainWindow = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 480, height: 300),
-            styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
-            backing: .buffered, defer: false)
-        self.mainWindow.isReleasedWhenClosed = false
-        self.mainWindow.title = "Open Wallpaper Engine 0.1.0 - Unofficial Edition"
-        self.mainWindow.titlebarAppearsTransparent = true
-        self.mainWindow.center()
-        self.mainWindow.setFrameAutosaveName("MainWindow")
-        self.mainWindow.contentView = NSHostingView(rootView: ContentView(viewModel: self.contentViewModel))
     }
     
 // MARK: Set Settings Window
@@ -242,6 +124,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSToolbarDelegate {
         self.settingsWindow.title = "Settings"
         self.settingsWindow.isReleasedWhenClosed = false
         self.settingsWindow.toolbarStyle = .preference
+        
+        self.settingsWindow.delegate = self
         
         let toolbar = NSToolbar(identifier: "SettingsToolbar")
         toolbar.delegate = self
@@ -255,64 +139,113 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSToolbarDelegate {
 // MARK: Set Wallpaper Window - Most efforts
     func setWallpaperWindow() {
         self.wallpaperWindow = NSWindow()
+        
         self.wallpaperWindow.styleMask = [.borderless, .fullSizeContentView]
-        self.wallpaperWindow.setFrame(NSScreen.main!.frame, display: true)
-        self.wallpaperWindow.level = NSWindow.Level(Int(CGWindowLevelForKey(.desktopWindow)) )
+        self.wallpaperWindow.level = NSWindow.Level(Int(CGWindowLevelForKey(.desktopWindow)))
         self.wallpaperWindow.collectionBehavior = .stationary
+        
+        self.wallpaperWindow.setFrame(NSRect(origin: .zero,
+                                             size: CGSize(width: NSScreen.main!.visibleFrame.size.width,
+                                                          height: NSScreen.main!.visibleFrame.size.height + NSScreen.main!.visibleFrame.origin.y + 1)
+                                            ),
+                                      display: true)
         self.wallpaperWindow.isMovable = false
         self.wallpaperWindow.titlebarAppearsTransparent = true
         self.wallpaperWindow.titleVisibility = .hidden
-        self.wallpaperWindow.styleMask.insert(.fullSizeContentView)
         self.wallpaperWindow.canHide = false
         self.wallpaperWindow.canBecomeVisibleWithoutLogin = true
         self.wallpaperWindow.isReleasedWhenClosed = false
         
-        self.wallpaperWindow.contentViewController = WallpaperViewController()
+        self.wallpaperWindow.contentView = NSHostingView(rootView:
+            WallpaperView(viewModel: self.wallpaperViewModel)
+        )
     }
     
-    func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        [SettingsToolbarIdentifiers.performance, SettingsToolbarIdentifiers.general, SettingsToolbarIdentifiers.plugins, SettingsToolbarIdentifiers.about]
-    }
-        
-    func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        [SettingsToolbarIdentifiers.performance, SettingsToolbarIdentifiers.general, SettingsToolbarIdentifiers.plugins, SettingsToolbarIdentifiers.about]
+    func windowWillClose(_ notification: Notification) {
+        globalSettingsViewModel.reset()
     }
     
-    func toolbarSelectableItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        [SettingsToolbarIdentifiers.performance, SettingsToolbarIdentifiers.general, SettingsToolbarIdentifiers.plugins, SettingsToolbarIdentifiers.about]
-    }
-    
-    func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
-        let toolbarItem = NSToolbarItem(itemIdentifier: itemIdentifier)
-        
-        switch itemIdentifier {
-        case SettingsToolbarIdentifiers.performance:
-            toolbarItem.action = #selector(jumpToPerformance)
-            toolbarItem.image = NSImage(systemSymbolName: "speedometer", accessibilityDescription: nil)
-            toolbarItem.label = "Performance"
+    func setEventHandler() {
+        self.eventHandler = NSEvent.addGlobalMonitorForEvents(matching: .any) { [weak self] event in
+            // contentView.subviews.first -> SwiftUIView.subviews.first -> WKWebView
+            if let webview = self?.wallpaperWindow.contentView?.subviews.first?.subviews.first,
+               let frontmostApplication = NSWorkspace.shared.frontmostApplication,
+                   webview is WKWebView,
+                   frontmostApplication.bundleIdentifier == "com.apple.finder" {
+                switch event.type {
+                case .scrollWheel:
+                    webview.scrollWheel(with: event)
+                case .mouseMoved:
+                    webview.mouseMoved(with: event)
+                case .mouseEntered:
+                    webview.mouseEntered(with: event)
+                case .mouseExited:
+                    webview.mouseExited(with: event)
 
-        case SettingsToolbarIdentifiers.general:
-            toolbarItem.action = #selector(jumpToGeneral)
-            toolbarItem.image = NSImage(systemSymbolName: "gearshape", accessibilityDescription: nil)
-            toolbarItem.label = "General"
-            
-        case SettingsToolbarIdentifiers.plugins:
-            toolbarItem.action = #selector(jumpToPlugins)
-            toolbarItem.image = NSImage(systemSymbolName: "puzzlepiece.extension", accessibilityDescription: nil)
-            toolbarItem.label = "Plugins"
-            
-        case SettingsToolbarIdentifiers.about:
-            toolbarItem.action = #selector(jumpToAbout)
-            toolbarItem.image = NSImage(systemSymbolName: "person.3", accessibilityDescription: nil)
-            toolbarItem.label = "About"
-            
-        default:
-            fatalError()
+                case .leftMouseUp:
+                    fallthrough
+                case .rightMouseUp:
+                    webview.mouseUp(with: event)
+                    
+                case .leftMouseDown:
+                    webview.mouseDown(with: event)
+    //            case .rightMouseDown:
+    //                view?.mouseDown(with: event)
+                    
+                case .leftMouseDragged:
+                    fallthrough
+                case .rightMouseDragged:
+                    webview.mouseDragged(with: event)
+                    
+                default:
+                    break
+                }
+            }
         }
-        
-        toolbarItem.isBordered = false
-        
-        return toolbarItem
+    }
+    
+    func saveCurrentWallpaper() {
+        var wallpaper: URL {
+            var osWallpaper: URL { NSWorkspace.shared.desktopImageURL(for: .main!)! }
+            if let wallpaper = UserDefaults.standard.url(forKey: "OSWallpaper") {
+                if wallpaper != osWallpaper {
+                    if !wallpaper.lastPathComponent.contains("staticWP") {
+                        return wallpaper
+                    }
+                }
+            }
+            return osWallpaper
+        }
+        UserDefaults.standard.set(wallpaper, forKey: "OSWallpaper")
+    }
+    
+    func setPlacehoderWallpaper(with wallpaper: WEWallpaper) {
+        switch wallpaper.project.type {
+        case "video":
+            let asset = AVAsset(url: wallpaper.wallpaperDirectory.appending(component: wallpaper.project.file))
+            let imageGenerator = AVAssetImageGenerator(asset: asset)
+            imageGenerator.appliesPreferredTrackTransform = true
+            
+            let time = CMTimeMake(value: 1, timescale: 1) // 第一帧的时间
+            imageGenerator.generateCGImagesAsynchronously(forTimes: [NSValue(time: time)]) { _, cgImage, _, _, error in
+                if let error = error {
+                    print(error)
+                } else if let cgImage = cgImage {
+                    let nsImage = NSImage(cgImage: cgImage, size: .zero)
+                    if let data = nsImage.tiffRepresentation {
+                        do {
+                            let url = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appending(path: "staticWP_\(wallpaper.wallpaperDirectory.hashValue).tiff")
+                            try data.write(to: url, options: .atomic)
+                            try NSWorkspace.shared.setDesktopImageURL(url, for: .main!)
+                        } catch {
+                            print(error)
+                        }
+                    }
+                }
+            }
+        default:
+            return
+        }
     }
 }
 
