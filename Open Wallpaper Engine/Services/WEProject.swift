@@ -34,9 +34,23 @@ struct WEProjectGeneral: Codable, Equatable, Hashable {
     var properties: WEProjectProperties
 }
 
-enum WorkshopId: Codable, Equatable, Hashable {
+enum WorkshopId: Codable, Equatable, Hashable, RawRepresentable {
     case int(Int)
     case string(String)
+    
+    var rawValue: String {
+        switch self {
+        case .int(let x):
+            return String(x)
+        case .string(let x):
+            return x
+        }
+    }
+    
+    init?(rawValue: String) {
+        guard rawValue.allSatisfy({ $0.isASCII && $0.isNumber }) else { return nil }
+        self = .string(rawValue)
+    }
     
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -63,6 +77,7 @@ enum WorkshopId: Codable, Equatable, Hashable {
 }
 
 struct WEProject: Codable, Equatable, Hashable {
+    var approved: Bool?
     var contentrating: String?
     var description: String?
     var file: String
@@ -72,12 +87,13 @@ struct WEProject: Codable, Equatable, Hashable {
     var title: String
     var visibility: String?
     var workshopid: WorkshopId?
+    var workshopurl: String?
     var type: String
     var version: Int?
     
     static let invalid = Self(file: "",
                               preview: "",
-                              title: "Error", 
+                              title: "Error",
                               type: "video")
 }
 
@@ -96,6 +112,12 @@ struct WEWallpaper: Codable, RawRepresentable, Identifiable {
     
     var wallpaperDirectory: URL
     var project: WEProject
+    
+    var wallpaperSize: Int {
+        guard let sizeBytes = try? self.wallpaperDirectory.directoryTotalAllocatedSize(includingSubfolders: true)
+        else { return 0 }
+        return sizeBytes
+    }
     
     init(using project: WEProject, where url: URL) {
         self.wallpaperDirectory = url
@@ -132,12 +154,20 @@ struct WEWallpaper: Codable, RawRepresentable, Identifiable {
     }
 }
 
-enum WEWallpaperSortingMethod: String {
-    case name, rating, likes, size, dateSubscribed, dateAdded
+enum WEWallpaperSortingMethod: String, CaseIterable, Identifiable {
+    
+    var id: Self { self }
+    
+    case name = "Name"
+    case rating = "Rating"
+//    case favorite = "Favorite"
+    case fileSize = "File Size"
+//    case subDate = "Subscription Date"
+//    case lastUpdated = "Last Updated"
 }
 
-enum WEWallpaperSortingSequence: String, CaseIterable {
-    case increased, decreased
+enum WEWallpaperSortingSequence: Int {
+    case decrease = 0, increase = 1
 }
 
 enum WEInitError: Error {
