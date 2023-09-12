@@ -18,18 +18,46 @@ struct WESceneGeneralOrthogonalProjection: Codable {
     var width: Int
 }
 
-struct WESceneGeneralBloomStrength: Codable {
+struct WESceneGeneralBloomStrengthObject: Codable {
     var user: String
     var value: Double
+}
+
+enum WESceneGeneralBloomStrength: Codable {
+    case double(Double)
+    case object(WESceneGeneralBloomStrengthObject)
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let x = try? container.decode(Double.self) {
+            self = .double(x)
+            return
+        }
+        if let x = try? container.decode(WESceneGeneralBloomStrengthObject.self) {
+            self = .object(x)
+            return
+        }
+        throw DecodingError.typeMismatch(Self.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for Scene Visible Object User Property"))
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .double(let x):
+            try container.encode(x)
+        case .object(let x):
+            try container.encode(x)
+        }
+    }
 }
 
 struct WESceneGeneral: Codable {
     var ambientcolor: String
     var bloom: Bool
-    var bloomhdrfeather: Double
-    var bloomhdrscatter: Double
-    var bloomhdrstrength: Double
-    var bloomhdrthreshold: Double
+    var bloomhdrfeather: Double?
+    var bloomhdrscatter: Double?
+    var bloomhdrstrength: Double?
+    var bloomhdrthreshold: Double?
     var bloomstrength: WESceneGeneralBloomStrength
     var bloomthreshold: Double
     var camerafade: Bool
@@ -46,11 +74,11 @@ struct WESceneGeneral: Codable {
     var clearenabled: Bool
     var farz: Double
     var fov: Double
-    var hdr: Bool
+    var hdr: Bool?
     var nearz: Double
     var orthogonalprojection: WESceneGeneralOrthogonalProjection
     var skylightcolor: String
-    var zoom: Double
+    var zoom: Double?
 }
 
 struct WESceneImage: WESceneObjectProtocol {
@@ -364,5 +392,5 @@ struct WEScene: Codable {
     var camera: WESceneCamera
     var general: WESceneGeneral
     var objects: [WESceneObject]
-    var version: Int
+    var version: Int?
 }
