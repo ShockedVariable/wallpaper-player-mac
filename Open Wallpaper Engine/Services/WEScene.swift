@@ -9,7 +9,7 @@ import Foundation
 
 struct WESceneCamera: Codable {
     var center: String
-    var sys: String
+    var eye: String
     var up: String
 }
 
@@ -57,15 +57,16 @@ struct WESceneImage: WESceneObjectProtocol {
     var alignment: String
     var alpha: Double
     var angles: String
-    var brightness: Int
+    var brightness: Double
     var color: String
-    var colorBlendMode: Bool
+    var colorBlendMode: Int
     var copybackground: Bool
-    var effects: WESceneEntityEffect
+    var effects: [WESceneEffect] // buggy
     var id: Int
     var image: String
     var ledsource: Bool
     var locktransforms: Bool
+    var name: String
     var origin: String
     var parallaxDepth: String
     var perspective: Bool
@@ -76,7 +77,10 @@ struct WESceneImage: WESceneObjectProtocol {
 }
 
 struct WESceneParticleInstanceOverride: Codable {
-    var colorn: String
+    var colorn: String?
+    
+    var alpha: Double?
+    
     var id: Int
 }
 
@@ -90,17 +94,50 @@ struct WESceneParticle: WESceneObjectProtocol {
     var parallaxDepth: String
     var particle: String
     var scale: String
-    var visible: WESceneObjectVisible
+    var visible: WESceneVisible
 }
 
-struct WESceneObjectVisibleObject: Codable {
-    var user: String
+struct WESceneVisibleObjectUserObject: Codable {
+    var condition: String
+    var name: String
+}
+
+enum WESceneVisibleObjectUser: Codable {
+    case string(String)
+    case object(WESceneVisibleObjectUserObject)
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let x = try? container.decode(String.self) {
+            self = .string(x)
+            return
+        }
+        if let x = try? container.decode(WESceneVisibleObjectUserObject.self) {
+            self = .object(x)
+            return
+        }
+        throw DecodingError.typeMismatch(Self.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for Scene Visible Object User Property"))
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .string(let x):
+            try container.encode(x)
+        case .object(let x):
+            try container.encode(x)
+        }
+    }
+}
+
+struct WESceneVisibleObject: Codable {
+    var user: WESceneVisibleObjectUser
     var value: Bool
 }
 
-enum WESceneObjectVisible: Codable {
+enum WESceneVisible: Codable {
     case bool(Bool)
-    case object(WESceneObjectVisibleObject)
+    case object(WESceneVisibleObject)
     
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -108,7 +145,7 @@ enum WESceneObjectVisible: Codable {
             self = .bool(x)
             return
         }
-        if let x = try? container.decode(WESceneObjectVisibleObject.self) {
+        if let x = try? container.decode(WESceneVisibleObject.self) {
             self = .object(x)
             return
         }
@@ -141,13 +178,54 @@ struct WESceneEntityText: Codable {
 struct WESceneEntityEffectPassConstantCombos: Codable {
     var EDGES: Int?
     var SAMPLES: Int?
+    
     var VERTICAL: Int?
+    
     var BLENDMODE: Int?
 }
 
+enum WESceneScale: Codable {
+    case double(Double)
+    case string(String)
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let x = try? container.decode(Double.self) {
+            self = .double(x)
+            return
+        }
+        if let x = try? container.decode(String.self) {
+            self = .string(x)
+            return
+        }
+        throw DecodingError.typeMismatch(Self.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for Scene Scale Property"))
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .double(let x):
+            try container.encode(x)
+        case .string(let x):
+            try container.encode(x)
+        }
+    }
+}
+
 struct WESceneEntityEffectPassConstantShaderValues: Codable {
-    var noiseamount: Double
-    var noisescale: Double
+    var direction: Double?
+    var rayintensity: Double?
+    var raylength: Double?
+    var speed: Double?
+    
+    var animationspeed: Double?
+    var ratio: Double?
+    var scrolldirection: Int?
+    
+    var scale: WESceneScale?
+    
+    var noiseamount: Double?
+    var noisescale: Double?
 }
 
 struct WESceneEntityEffectPass: Codable {
@@ -175,11 +253,12 @@ struct WESceneEntityEffectPass: Codable {
     }
 }
 
-struct WESceneEntityEffect: Codable {
+struct WESceneEffect: Codable {
     var file: String
-    var id: String
+    var id: Int
     var name: String
     var passes: [WESceneEntityEffectPass]
+    var visible: WESceneVisible
 }
 
 struct WESceneEntity: WESceneObjectProtocol {
@@ -192,7 +271,7 @@ struct WESceneEntity: WESceneObjectProtocol {
     var color: String
     var colorBlendMode: Int
     var copybackground: Bool
-    var effects: [WESceneEntityEffect]
+    var effects: [WESceneEffect] // buggy
     var font: String
     var horizontalalign: String
     var id: Int
@@ -210,7 +289,7 @@ struct WESceneEntity: WESceneObjectProtocol {
     var solid: Bool
     var text: WESceneEntityText
     var verticalalign: String
-    var visible: WESceneObjectVisible
+    var visible: WESceneVisible
 }
 
 struct WESceneAudio: WESceneObjectProtocol {
@@ -239,11 +318,11 @@ protocol WESceneObjectProtocol: Codable {
     var scale: String { get set }
 }
 
-enum WESceneObject /*: Codable, Equatable, Hashable*/ {
-//    case int(Int)
-//    case string(String)
+enum WESceneObject: Codable {
     case audio(WESceneAudio)
+    case image(WESceneImage)
     case entity(WESceneEntity)
+    case particle(WESceneParticle)
     
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -251,8 +330,16 @@ enum WESceneObject /*: Codable, Equatable, Hashable*/ {
             self = .audio(x)
             return
         }
+        if let x = try? container.decode(WESceneImage.self) {
+            self = .image(x)
+            return
+        }
         if let x = try? container.decode(WESceneEntity.self) {
             self = .entity(x)
+            return
+        }
+        if let x = try? container.decode(WESceneParticle.self) {
+            self = .particle(x)
             return
         }
         throw DecodingError.typeMismatch(Self.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Wrong type for Scene Object"))
@@ -263,7 +350,11 @@ enum WESceneObject /*: Codable, Equatable, Hashable*/ {
         switch self {
         case .audio(let x):
             try container.encode(x)
+        case .image(let x):
+            try container.encode(x)
         case .entity(let x):
+            try container.encode(x)
+        case .particle(let x):
             try container.encode(x)
         }
     }
@@ -272,6 +363,6 @@ enum WESceneObject /*: Codable, Equatable, Hashable*/ {
 struct WEScene: Codable {
     var camera: WESceneCamera
     var general: WESceneGeneral
-    var objects: [Int]
+    var objects: [WESceneObject]
     var version: Int
 }
