@@ -36,24 +36,26 @@ struct SettingsView: View {
     @EnvironmentObject var viewModel: GlobalSettingsViewModel
     
     var body: some View {
-        VStack {
-            Group {
-                switch viewModel.selection {
-                case 0:
-                    PerformancePage(globalSettings: viewModel)
-                case 1:
-                    GeneralPage(globalSettings: viewModel)
-                case 2:
-                    PluginsPage(globalSettings: viewModel)
-                case 3:
-                    AboutUsView()
-                default:
-                    fatalError()
+        TabView {
+            PerformancePage(globalSettings: viewModel)
+                .tabItem {
+                    Label("Performance", systemImage: "speedometer")
                 }
-            }
-            .frame(minHeight: 400, maxHeight: 800)
-            
-            
+            GeneralPage(globalSettings: viewModel)
+                .tabItem {
+                    Label("General", systemImage: "gearshape")
+                }
+            PluginsPage(globalSettings: viewModel)
+                .tabItem {
+                    Label("Plugins", systemImage: "puzzlepiece.extension")
+                }
+            AboutUsView()
+                .tabItem {
+                    Label("About", systemImage: "person.3")
+                }
+        }
+        .frame(minWidth: 500, minHeight: 400, maxHeight: 800)
+        .overlay(alignment: .bottom) {
             HStack {
                 if let savedSettings = try? JSONDecoder()
                     .decode(GlobalSettings.self,
@@ -81,7 +83,7 @@ struct SettingsView: View {
             }
             .padding(20)
         }
-        .frame(minWidth: 500)
+        
     }
 }
 

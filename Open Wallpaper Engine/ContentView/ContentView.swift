@@ -16,7 +16,11 @@ protocol SubviewOfContentView: View {
 struct ContentView: View {
     @EnvironmentObject var globalSettingsViewModel: GlobalSettingsViewModel
     
-    @ObservedObject var viewModel: ContentViewModel
+    @State private var isDetailReveal = false
+    
+    @Namespace var detailAnimation
+    
+    @StateObject var viewModel = ContentViewModel()
     
     @ObservedObject var wallpaperViewModel: WallpaperViewModel
     
@@ -31,59 +35,148 @@ struct ContentView: View {
     @State var greet: String = "Hello, world!"
     
     var body: some View {
-        ZStack {
-            HSplitView {
-                if viewModel.isStaging {
-                    VStack(spacing: 5) {
-                        TopTabBar(contentViewModel: viewModel)
-                        switch viewModel.topTabBarSelection {
-                        case 0:
-                            ExplorerTopBar(contentViewModel: viewModel)
-                                .environmentObject(globalSettingsViewModel)
-                            HStack(spacing: 0) {
-                                HStack(spacing: 0) {
-                                    // MARK: Filter Results
-                                    FilterResults(viewModel: viewModel)
-                                }
-                                .frame(width: viewModel.isFilterReveal ? 225 : 0)
-                                .opacity(viewModel.isFilterReveal ? 1 : 0)
-                                .animation(.spring(), value: viewModel.isFilterReveal)
-                                
-                                WallpaperExplorer(contentViewModel: viewModel, wallpaperViewModel: wallpaperViewModel)
-                                .onDrop(of: [.fileURL], delegate: viewModel)
-                                .contextMenu {
-                                    ExplorerGlobalMenu(contentViewModel: viewModel, wallpaperViewModel: wallpaperViewModel)
-                                }
-                                .padding(.leading, viewModel.isFilterReveal ? 10 : 0)
-                            }
-                            .animation(.default, value: viewModel.isFilterReveal)
-                        case 1:
-                            WallpaperDiscover()
-                        case 2:
-                            ExplorerTopBar(contentViewModel: viewModel)
-                            WorkingInProgress()
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        default:
-                            fatalError()
-                        }
-                        ExplorerBottomBar()
+        NavigationSplitView {
+            List {
+                Section("Workshop") {
+                    NavigationLink {
+                        WallpaperExplorer(contentViewModel: viewModel, wallpaperViewModel: wallpaperViewModel)
+                            .background(Color(nsColor: .controlBackgroundColor))
+                    } label: {
+                        Label("Browse", systemImage: "square.grid.2x2")
                     }
-                    .padding()
-                    WallpaperPreview(contentViewModel: viewModel, wallpaperViewModel: wallpaperViewModel)
+                }
+                
+                Section("Library") {
+                    NavigationLink {
+                        EmptyView()
+                    } label: {
+                        Label("Installed", systemImage: "square.and.arrow.down.fill")
+                    }
+                    NavigationLink {
+                        WallpaperExplorer(contentViewModel: viewModel, wallpaperViewModel: wallpaperViewModel)
+                            .background(Color(nsColor: .controlBackgroundColor))
+                    } label: {
+                        Label("Discover", systemImage: "sparkle.magnifyingglass")
+                    }
+                    NavigationLink {
+                        WallpaperExplorer(contentViewModel: viewModel, wallpaperViewModel: wallpaperViewModel)
+                            .background(Color(nsColor: .controlBackgroundColor))
+                    } label: {
+                        Label("Workshop", systemImage: "cloud.fill")
+                    }
+                }
+                
+                Section("Playlists") {
+                    NavigationLink {
+                        WallpaperExplorer(contentViewModel: viewModel, wallpaperViewModel: wallpaperViewModel)
+                            .background(Color(nsColor: .controlBackgroundColor))
+                    } label: {
+                        Label("All Playlists", systemImage: "square.grid.3x3")
+                    }
+                }
+                .tint(.secondary)
+            }
+            .searchable(text: $greet, placement: .sidebar)
+            
+        } detail: {
+            WallpaperExplorer(contentViewModel: viewModel, wallpaperViewModel: wallpaperViewModel)
+                .background(Color(nsColor: .controlBackgroundColor))
+                .overlay(alignment: .topTrailing) {
+                    if isDetailReveal {
+                        WallpaperPreview(contentViewModel: viewModel,
+                                         wallpaperViewModel: wallpaperViewModel)
+                        .border(Color(nsColor: .separatorColor))
+                        .background(Color(nsColor: NSColor.windowBackgroundColor))
+                        .clipShape(RoundedRectangle(cornerRadius: 8.0))
+                        .padding([.vertical, .trailing])
                         .frame(maxWidth: 320)
+                        .matchedGeometryEffect(id: "detail", in: detailAnimation)
+                    } else {
+                        Button {
+                            withAnimation(.spring()) {
+                                isDetailReveal = true
+                            }
+                            print("tapped")
+                        } label: {
+                            Image(systemName: "plus")
+                                .foregroundStyle(Color.white)
+                                .padding(10)
+                                .font(.title)
+                                .background(Color.gray)
+                                .clipShape(Circle())
+                                .contentShape(Circle())
+                        }
+                        .offset(x: 100, y: 0)
+                        .padding()
+                        .buttonStyle(.plain)
+                        .matchedGeometryEffect(id: "detail", in: detailAnimation)
+                    }
+                    
+                }
+        }
+        .presentedWindowToolbarStyle(.unifiedCompact(showsTitle: false))
+        .toolbar {
+            ToolbarItemGroup(placement: .principal) {
+                Button {
+                    
+                } label: {
+                    Image(systemName: "backward.fill")
+                }
+                Button {
+                    
+                } label: {
+                    Image(systemName: "play.fill")
+                }
+                Button {
+                    
+                } label: {
+                    Image(systemName: "forward.fill")
                 }
             }
-            .opacity(viewModel.isStaging ? 1 : 0)
-            .blur(radius: viewModel.isStaging ? 0 : 2.0)
-            
-            // indicate that this view is initializing
-            if !viewModel.isStaging {
-                HStack(spacing: 20) {
-                    Text("Power Saving Mode, Sleeping...")
-                        .font(.largeTitle)
+            ToolbarItem(placement: .principal) {
+                HStack {
+                    VStack {
+                        Spacer()
+                        Text("HEllo")
+                        Spacer()
+                    }
+                }
+                .frame(width: 200)
+                .border(Color(nsColor: NSColor.separatorColor))
+            }
+            ToolbarItem {
+                Slider(value: $wallpaperViewModel.playVolume,
+                       in: 0...1) {
+                    Text("EHEHE")
+                } minimumValueLabel: {
+                    Button {
+                        
+                    } label: {
+                        Image(systemName: "speaker.fill")
+                            .imageScale(.small)
+                    }
+                } maximumValueLabel: {
+                    Button {
+                        
+                    } label: {
+                        Image(systemName: "speaker.wave.3.fill")
+                            .imageScale(.small)
+                    }
+                }
+                .controlSize(.mini)
+                .frame(width: 110)
+            }
+            ToolbarItem(placement: .secondaryAction) {
+                Button {
+                    withAnimation(.spring()) {
+                        isDetailReveal.toggle()
+                    }
+                } label: {
+                    Image(systemName: "list.bullet")
                 }
             }
         }
+        .navigationSplitViewStyle(.prominentDetail)
         .confirmationDialog("Unsubscribe Confirmation",
                             isPresented: $viewModel.isUnsubscribeConfirming) {
             if let url = viewModel.hoveredWallpaper?.wallpaperDirectory {
@@ -124,13 +217,11 @@ struct ContentView: View {
             UnsafeWallpaper(wallpaper: wallpaperViewModel.nextCurrentWallpaper)
                 .frame(width: 600, height: 300)
         }
-        .frame(minWidth: 1000, minHeight: 640, idealHeight: 800)
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView(viewModel: .init(isStaging: true), wallpaperViewModel: .init())
-            .environmentObject(GlobalSettingsViewModel())
-    }
+#Preview {
+    ContentView(wallpaperViewModel: .init())
+        .frame(width: 800)
+        .environmentObject(GlobalSettingsViewModel())
 }

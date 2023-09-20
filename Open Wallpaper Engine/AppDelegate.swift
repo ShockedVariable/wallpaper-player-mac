@@ -31,29 +31,29 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     func applicationWillFinishLaunching(_ notification: Notification) {
         // 创建设置视窗
-        setSettingsWindow()
+//        setSettingsWindow()
         
         // 创建桌面壁纸视窗
         setWallpaperWindow()
         
         // 创建化左上角菜单栏
-        setMainMenu()
+//        setMainMenu()
         
         // 创建化右上角常驻菜单栏
-        setStatusMenu()
+//        setStatusMenu()
         
         // 创建主视窗
-        self.mainWindowController = MainWindowController()
+//        self.mainWindowController = MainWindowController()
         
         // 将外部输入传递到壁纸窗口
-        AppDelegate.shared.setEventHandler()
+//        AppDelegate.shared.setEventHandler()
     }
     
-    func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
-        let dockMenu = self.statusItem.menu?.copy() as! NSMenu?
-        dockMenu?.items.removeLast() // Remove `Quit` menu item
-        return dockMenu
-    }
+//    func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
+//        let dockMenu = self.statusItem.menu?.copy() as! NSMenu?
+//        dockMenu?.items.removeLast() // Remove `Quit` menu item
+//        return dockMenu
+//    }
     
 // MARK: - delegate methods
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -69,17 +69,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
     }
     
-    func applicationDidBecomeActive(_ notification: Notification) {
-        NSApp.activate(ignoringOtherApps: true)
-    }
-    
-    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        if !self.mainWindowController.window.isVisible && !settingsWindow.isVisible {
-            self.mainWindowController.window?.makeKeyAndOrderFront(nil)
-        }
-        
-        return true
-    }
+//    func applicationDidBecomeActive(_ notification: Notification) {
+//        NSApp.activate(ignoringOtherApps: true)
+//    }
+//    
+//    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+//        if !self.mainWindowController.window.isVisible && !settingsWindow.isVisible {
+//            self.mainWindowController.window?.makeKeyAndOrderFront(nil)
+//        }
+//        
+//        return true
+//    }
     
     func applicationWillTerminate(_ notification: Notification) {
         if let wallpaper = UserDefaults.standard.url(forKey: "OSWallpaper") {
@@ -171,44 +171,44 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         globalSettingsViewModel.reset()
     }
     
-    func setEventHandler() {
-        self.eventHandler = NSEvent.addGlobalMonitorForEvents(matching: .any) { [weak self] event in
-            // contentView.subviews.first -> SwiftUIView.subviews.first -> WKWebView
-            if let webview = self?.wallpaperWindow.contentView?.subviews.first?.subviews.first,
-               let frontmostApplication = NSWorkspace.shared.frontmostApplication,
-                   webview is WKWebView,
-                   frontmostApplication.bundleIdentifier == "com.apple.finder" {
-                switch event.type {
-                case .scrollWheel:
-                    webview.scrollWheel(with: event)
-                case .mouseMoved:
-                    webview.mouseMoved(with: event)
-                case .mouseEntered:
-                    webview.mouseEntered(with: event)
-                case .mouseExited:
-                    webview.mouseExited(with: event)
-
-                case .leftMouseUp:
-                    fallthrough
-                case .rightMouseUp:
-                    webview.mouseUp(with: event)
-                    
-                case .leftMouseDown:
-                    webview.mouseDown(with: event)
-    //            case .rightMouseDown:
-    //                view?.mouseDown(with: event)
-                    
-                case .leftMouseDragged:
-                    fallthrough
-                case .rightMouseDragged:
-                    webview.mouseDragged(with: event)
-                    
-                default:
-                    break
-                }
-            }
-        }
-    }
+//    func setEventHandler() {
+//        self.eventHandler = NSEvent.addGlobalMonitorForEvents(matching: .any) { [weak self] event in
+//            // contentView.subviews.first -> SwiftUIView.subviews.first -> WKWebView
+//            if let webview = self?.wallpaperWindow.contentView?.subviews.first?.subviews.first,
+//               let frontmostApplication = NSWorkspace.shared.frontmostApplication,
+//                   webview is WKWebView,
+//                   frontmostApplication.bundleIdentifier == "com.apple.finder" {
+//                switch event.type {
+//                case .scrollWheel:
+//                    webview.scrollWheel(with: event)
+//                case .mouseMoved:
+//                    webview.mouseMoved(with: event)
+//                case .mouseEntered:
+//                    webview.mouseEntered(with: event)
+//                case .mouseExited:
+//                    webview.mouseExited(with: event)
+//
+//                case .leftMouseUp:
+//                    fallthrough
+//                case .rightMouseUp:
+//                    webview.mouseUp(with: event)
+//                    
+//                case .leftMouseDown:
+//                    webview.mouseDown(with: event)
+//    //            case .rightMouseDown:
+//    //                view?.mouseDown(with: event)
+//                    
+//                case .leftMouseDragged:
+//                    fallthrough
+//                case .rightMouseDragged:
+//                    webview.mouseDragged(with: event)
+//                    
+//                default:
+//                    break
+//                }
+//            }
+//        }
+//    }
     
     func saveCurrentWallpaper() {
         var wallpaper: URL {

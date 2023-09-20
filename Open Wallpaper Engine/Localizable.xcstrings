@@ -105,9 +105,6 @@
     "%@" : {
 
     },
-    "%lld" : {
-
-    },
     "×8 MSAA is only recommended for powerful high-end desktop graphics cards." : {
       "localizations" : {
         "zh-Hans" : {
@@ -117,6 +114,9 @@
           }
         }
       }
+    },
+    "< Placeholder >" : {
+
     },
     "1 per page (developer)" : {
 
@@ -258,6 +258,9 @@
         }
       }
     },
+    "All Playlists" : {
+
+    },
     "Animates" : {
 
     },
@@ -390,6 +393,9 @@
           }
         }
       }
+    },
+    "Browse" : {
+
     },
     "Browse All By" : {
       "localizations" : {
@@ -657,6 +663,9 @@
         }
       }
     },
+    "EHEHE" : {
+
+    },
     "Enabled" : {
       "localizations" : {
         "zh-Hans" : {
@@ -790,6 +799,12 @@
           }
         }
       }
+    },
+    "HEllo" : {
+
+    },
+    "Hello, world!" : {
+
     },
     "Hello, World!" : {
       "localizations" : {
@@ -974,6 +989,9 @@
           }
         }
       }
+    },
+    "Library" : {
+
     },
     "Light" : {
       "localizations" : {
@@ -1368,6 +1386,9 @@
         }
       }
     },
+    "Picker" : {
+
+    },
     "Playback" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1397,6 +1418,9 @@
           }
         }
       }
+    },
+    "Playlists" : {
+
     },
     "Please be aware of malware." : {
       "localizations" : {
@@ -1460,6 +1484,7 @@
       }
     },
     "Power Saving Mode, Sleeping..." : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1822,6 +1847,9 @@
         }
       }
     },
+    "Show Wallpaper Studio" : {
+
+    },
     "Similar UI Layout to Wallpaper Engine on Steam" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1915,6 +1943,9 @@
           }
         }
       }
+    },
+    "Support Documentation" : {
+
     },
     "Tags" : {
       "localizations" : {
@@ -2185,7 +2216,11 @@
         }
       }
     },
+    "Wallpaper Studio" : {
+
+    },
     "Wallpaper Title" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2284,6 +2319,9 @@
           }
         }
       }
+    },
+    "World!" : {
+
     },
     "You are about to open an external %@ as a wallpaper:" : {
       "localizations" : {

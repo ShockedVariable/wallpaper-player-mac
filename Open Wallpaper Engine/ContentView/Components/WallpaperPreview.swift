@@ -34,57 +34,39 @@ struct WallpaperPreview: SubviewOfContentView {
     }
     
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
+            Picker("Picker", selection: .constant(0)) {
+                Image(systemName: "info.circle")
+                Image(systemName: "paintbrush")
+            }
+            .padding()
+            .labelsHidden()
+            .pickerStyle(.segmented)
+            Divider()
             ScrollView {
                 VStack(spacing: 16) {
-                    VStack(spacing: 10) {
-                        GifImage(contentsOf: { (url: URL) in
-                            if let selectedProject = try? JSONDecoder()
-                                .decode(WEProject.self, from: Data(contentsOf: url.appending(path: "project.json"))) {
-                                return url.appending(path: selectedProject.preview)
-                            }
-                            return Bundle.main.url(forResource: "WallpaperNotFound", withExtension: "mp4")!
-                        }(wallpaperViewModel.currentWallpaper.wallpaperDirectory))
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .background(Color(nsColor: NSColor.controlBackgroundColor))
-                            .frame(width: 280, height: 280)
-                            .clipShape(RoundedRectangle(cornerRadius: 16.0))
-                            .border(Color.white, width: 4)
-                        HStack {
-                            if isEditingId == "title" {
-                                TextField("Wallpaper Title", text: $title)
-                                    .onSubmit {
-                                        var wallpaper = wallpaperViewModel.currentWallpaper
-                                        
-                                        wallpaper.project.title = title
-                                        
-                                        guard let data = try? JSONEncoder().encode(wallpaper.project) else { return }
-                                        
-                                        try? data.write(to: wallpaper.wallpaperDirectory.appending(path: "project.json"), options: .atomic)
-                                        
-                                        wallpaperViewModel.currentWallpaper = wallpaper
-                                        
-                                        isEditingId = ""
-                                    }
-                            } else {
-                                Text(wallpaperViewModel.currentWallpaper.project.title.isEmpty ? "Untitled" : wallpaperViewModel.currentWallpaper.project.title)
-                                    .frame(minWidth: 50)
-                                    .id("title")
-                                    .lineLimit(1)
-                                    .onTapGesture(count: 2) {
-                                        title = wallpaperViewModel.currentWallpaper.project.title
-                                        isEditingId = "title"
-                                    }
-                                Image(systemName: "square.and.pencil")
-                            }
-                            
+                    GifImage(contentsOf: { (url: URL) in
+                        if let selectedProject = try? JSONDecoder()
+                            .decode(WEProject.self, from: Data(contentsOf: url.appending(path: "project.json"))) {
+                            return url.appending(path: selectedProject.preview)
                         }
+                        return Bundle.main.url(forResource: "WallpaperNotFound", withExtension: "mp4")!
+                    }(wallpaperViewModel.currentWallpaper.wallpaperDirectory))
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .background(Color(nsColor: NSColor.controlBackgroundColor))
+                        .frame(width: 280, height: 280)
+                        .clipShape(RoundedRectangle(cornerRadius: 16.0))
+                    VStack(alignment: .leading) {
+                        Text(wallpaperViewModel.currentWallpaper.project.title.isEmpty ?
+                             "Untitled" : wallpaperViewModel.currentWallpaper.project.title)
+                            .bold()
+                            .lineLimit(1)
                     }
+                    .frame(maxWidth: .infinity)
                     HStack {
-                        Image("we.placeholder")
-                            .resizable()
-                            .frame(width: 32, height: 32)
+                        Image(systemName: "person.crop.circle.badge.questionmark")
+                            .imageScale(.large)
                         Text("Unkown Author")
                     }
                     HStack {
@@ -263,22 +245,6 @@ struct WallpaperPreview: SubviewOfContentView {
                 .animation(.default, value: wallpaperViewModel.currentWallpaper.project)
                 .padding([.horizontal, .top])
             }
-
-            HStack {
-                Spacer()
-                Button {
-                    AppDelegate.shared.mainWindowController.close()
-                } label: {
-                    Text("OK").frame(width: 50)
-                }
-                .buttonStyle(.borderedProminent)
-                Button { 
-                    AppDelegate.shared.mainWindowController.close()
-                } label: {
-                    Text("Cancel").frame(width: 50)
-                }
-            }
-            .padding()
         }
     }
     
@@ -377,4 +343,10 @@ extension URL {
                     .totalFileAllocatedSize ?? 0) + $0
         }
     }
+}
+
+#Preview {
+    WallpaperPreview(contentViewModel: .init(),
+                     wallpaperViewModel: .init())
+    .frame(width: 320, height: 600)
 }

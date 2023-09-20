@@ -36,9 +36,10 @@ struct WallpaperExplorer: SubviewOfContentView {
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 50)
             } else {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: viewModel.explorerIconSize, 
-                                                       maximum: viewModel.explorerIconSize * 2)
-                )], alignment: .leading) {
+                LazyVGrid(columns: [GridItem(
+                        .adaptive(minimum: viewModel.explorerIconSize,
+                                maximum: viewModel.explorerIconSize * 2))],
+                        alignment: .leading, spacing: 30) {
                     ForEach(Array(viewModel.autoRefreshWallpapers.enumerated()), id: \.0) { (index, wallpaper) in
                         ExplorerItem(viewModel: viewModel, wallpaperViewModel: wallpaperViewModel, wallpaper: wallpaper, index: index)
                             .contextMenu {
@@ -49,20 +50,7 @@ struct WallpaperExplorer: SubviewOfContentView {
 //                            .animation(.spring(), value: wallpaperViewModel.currentWallpaper.rawValue)
                     }
                 }
-                .padding(.trailing)
-            }
-        }
-        .overlay {
-            VStack {
-                Spacer()
-                HStack {
-                    ForEach(0..<viewModel.maxPage, id: \.self) { page in
-                        Button("\(page + 1)") {
-                            viewModel.currentPage = page + 1
-                        }
-                    }
-                }
-                .padding(.bottom)
+                .padding(.horizontal)
             }
         }
     }
@@ -86,4 +74,10 @@ extension View {
     func selected(_ selected: Bool = true) -> some View {
         return modifier(SelectedItem(selected))
     }
+}
+
+#Preview {
+    WallpaperExplorer(contentViewModel: .init(),
+                      wallpaperViewModel: .init())
+    .frame(width: 500, height: 600)
 }

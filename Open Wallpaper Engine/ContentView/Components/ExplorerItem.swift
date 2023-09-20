@@ -18,7 +18,7 @@ struct ExplorerItem: SubviewOfContentView {
     var index: Int
     
     var body: some View {
-        ZStack(alignment: .bottom) {
+        VStack(spacing: 5) {
             GifImage(contentsOf: { (url: URL) in
                 if let selectedProject = try? JSONDecoder()
                     .decode(WEProject.self, from: Data(contentsOf: url.appending(path: "project.json"))) {
@@ -27,33 +27,32 @@ struct ExplorerItem: SubviewOfContentView {
                 return Bundle.main.url(forResource: "WallpaperNotFound", withExtension: "mp4")!
             }(wallpaper.wallpaperDirectory), animates: animates)
             .resizable()
-            .scaleEffect(viewModel.imageScaleIndex == index ? 1.2 : 1.0)
-            .aspectRatio(1.0, contentMode: .fit)
             .clipped()
+            .clipShape(RoundedRectangle(cornerRadius: 6.0))
+            .selected(wallpaper.wallpaperDirectory == wallpaperViewModel.currentWallpaper.wallpaperDirectory)
             
-            Text(wallpaper.project.title)
-                .lineLimit(2)
-                .frame(maxWidth: .infinity, minHeight: 30)
-                .padding(4)
-                .background(Color(white: 0, opacity: viewModel.imageScaleIndex == index ? 0.4 : 0.2))
-                .font(.footnote)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(Color(white: viewModel.imageScaleIndex == index ? 0.9 : 0.7))
-            
-//            Spacer()
-//                .onHover { onHover in
-//                    if onHover {
-//                        viewModel.imageScaleIndex = index
-//                    } else {
-//                        viewModel.imageScaleIndex = -1
-//                    }
-//                }
+            VStack {
+                Text(wallpaper.project.title)
+                    .lineLimit(2)
+                    .font(.callout)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text("< Placeholder >")
+                    .lineLimit(1)
+                    .font(.caption)
+                    .foregroundStyle(Color.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
-        .selected(wallpaper.wallpaperDirectory == wallpaperViewModel.currentWallpaper.wallpaperDirectory)
-        .border(Color.accentColor, width: viewModel.imageScaleIndex == index ? 1.0 : 0)
+        .frame(height: 150)
         .onTapGesture {
-//            viewModel.selectedIndex = index
             wallpaperViewModel.nextCurrentWallpaper = wallpaper
         }
     }
+}
+
+#Preview {
+    WallpaperExplorer(contentViewModel: .init(),
+                      wallpaperViewModel: .init())
+    .frame(width: 500, height: 600)
 }
