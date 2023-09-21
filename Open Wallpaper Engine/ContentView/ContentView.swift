@@ -85,8 +85,8 @@ struct ContentView: View {
                     if isDetailReveal {
                         WallpaperPreview(contentViewModel: viewModel,
                                          wallpaperViewModel: wallpaperViewModel)
-                        .border(Color(nsColor: .separatorColor))
-                        .background(Color(nsColor: NSColor.windowBackgroundColor))
+//                        .border(Color(nsColor: .separatorColor))
+                        .background(.ultraThickMaterial)
                         .clipShape(RoundedRectangle(cornerRadius: 8.0))
                         .padding([.vertical, .trailing])
                         .frame(maxWidth: 320)
@@ -116,7 +116,7 @@ struct ContentView: View {
         }
         .presentedWindowToolbarStyle(.unifiedCompact(showsTitle: false))
         .toolbar {
-            ToolbarItemGroup(placement: .principal) {
+            ToolbarItemGroup(placement: .cancellationAction) {
                 Button {
                     
                 } label: {
@@ -133,7 +133,10 @@ struct ContentView: View {
                     Image(systemName: "forward.fill")
                 }
             }
-            ToolbarItem(placement: .principal) {
+            ToolbarItem {
+                Spacer()
+            }
+            ToolbarItem {
                 HStack {
                     VStack {
                         Spacer()
@@ -166,7 +169,7 @@ struct ContentView: View {
                 .controlSize(.mini)
                 .frame(width: 110)
             }
-            ToolbarItem(placement: .secondaryAction) {
+            ToolbarItem {
                 Button {
                     withAnimation(.spring()) {
                         isDetailReveal.toggle()
@@ -222,6 +225,6 @@ struct ContentView: View {
 
 #Preview {
     ContentView(wallpaperViewModel: .init())
-        .frame(width: 800)
+        .frame(width: 1000, height: 600)
         .environmentObject(GlobalSettingsViewModel())
 }

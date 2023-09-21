@@ -17,12 +17,16 @@ struct WallpaperStudioApp: App {
     
     var body: some Scene {
         
-        // Main Window, which displays all contents relative to wallpapers' playback & control
+        /// Main Window, which displays all contents relative to wallpapers' playback & control
         Window("Wallpaper Studio", id: "main-window") {
             ContentView(wallpaperViewModel: wallpaper)
                 .environmentObject(globalSettings)
         }
         .keyboardShortcut("1", modifiers: [.command, .shift])
+        
+        WindowGroup("Wallpaper", id: "wallpaper-window") {
+            WallpaperView(viewModel: wallpaper)
+        }
         
         // Show Wiki Page on GitHub
         Window("Support Documentation", id: "support-documentation") {

@@ -29,57 +29,29 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     static var shared = AppDelegate()
     
-    func applicationWillFinishLaunching(_ notification: Notification) {
-        // 创建设置视窗
-//        setSettingsWindow()
-        
-        // 创建桌面壁纸视窗
-        setWallpaperWindow()
-        
-        // 创建化左上角菜单栏
-//        setMainMenu()
-        
-        // 创建化右上角常驻菜单栏
-//        setStatusMenu()
-        
-        // 创建主视窗
-//        self.mainWindowController = MainWindowController()
-        
-        // 将外部输入传递到壁纸窗口
-//        AppDelegate.shared.setEventHandler()
-    }
-    
-//    func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
-//        let dockMenu = self.statusItem.menu?.copy() as! NSMenu?
-//        dockMenu?.items.removeLast() // Remove `Quit` menu item
-//        return dockMenu
-//    }
-    
 // MARK: - delegate methods
     func applicationDidFinishLaunching(_ notification: Notification) {
         saveCurrentWallpaper()
         AppDelegate.shared.setPlacehoderWallpaper(with: wallpaperViewModel.currentWallpaper)
         
-        // 显示桌面壁纸
-        self.wallpaperWindow.orderFront(nil)
-        
-        if globalSettingsViewModel.isFirstLaunch {
-            self.mainWindowController.window.center()
-            self.mainWindowController.window.makeKeyAndOrderFront(nil)
+        for window in NSApp.windows {
+            if window.title == "Wallpaper" {
+                window.styleMask = [.borderless, .fullSizeContentView]
+                window.level = NSWindow.Level(Int(CGWindowLevelForKey(.desktopWindow)))
+                window.collectionBehavior = .stationary
+                
+                window.setFrame(NSRect(origin: .zero,
+                                                     size: CGSize(width: NSScreen.main!.visibleFrame.size.width,
+                                                                  height: NSScreen.main!.visibleFrame.size.height + NSScreen.main!.visibleFrame.origin.y + 1)
+                                                    ),
+                                              display: true)
+                window.isMovable = false
+                window.titlebarAppearsTransparent = true
+                window.titleVisibility = .hidden
+                window.canHide = false
+            }
         }
     }
-    
-//    func applicationDidBecomeActive(_ notification: Notification) {
-//        NSApp.activate(ignoringOtherApps: true)
-//    }
-//    
-//    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-//        if !self.mainWindowController.window.isVisible && !settingsWindow.isVisible {
-//            self.mainWindowController.window?.makeKeyAndOrderFront(nil)
-//        }
-//        
-//        return true
-//    }
     
     func applicationWillTerminate(_ notification: Notification) {
         if let wallpaper = UserDefaults.standard.url(forKey: "OSWallpaper") {
