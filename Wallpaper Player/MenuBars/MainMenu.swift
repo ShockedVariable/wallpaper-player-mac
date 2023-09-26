@@ -131,11 +131,3 @@ extension AppDelegate {
         UserDefaults.standard.set([String](), forKey: "TrustedWallpapers")
     }
 }
-
-extension NSMenuItem {
-    public convenience init(title: String, systemImage: String, action: Selector?, keyEquivalent: String) {
-        self.init(title: title, action: action, keyEquivalent: keyEquivalent)
-        self.image = NSImage(systemSymbolName: systemImage, accessibilityDescription: nil)
-        
-    }
-}

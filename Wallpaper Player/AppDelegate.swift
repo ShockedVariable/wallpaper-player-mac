@@ -34,23 +34,27 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         saveCurrentWallpaper()
         AppDelegate.shared.setPlacehoderWallpaper(with: wallpaperViewModel.currentWallpaper)
         
-        for window in NSApp.windows {
-            if window.title == "Wallpaper" {
-                window.styleMask = [.borderless, .fullSizeContentView]
-                window.level = NSWindow.Level(Int(CGWindowLevelForKey(.desktopWindow)))
-                window.collectionBehavior = .stationary
-                
-                window.setFrame(NSRect(origin: .zero,
-                                                     size: CGSize(width: NSScreen.main!.visibleFrame.size.width,
-                                                                  height: NSScreen.main!.visibleFrame.size.height + NSScreen.main!.visibleFrame.origin.y + 1)
-                                                    ),
-                                              display: true)
-                window.isMovable = false
-                window.titlebarAppearsTransparent = true
-                window.titleVisibility = .hidden
-                window.canHide = false
-            }
-        }
+        setWallpaperWindow()
+        
+        wallpaperWindow.orderFront(nil)
+        
+//        for window in NSApp.windows {
+//            if window.title == "Wallpaper" {
+//                window.styleMask = [.borderless, .fullSizeContentView]
+//                window.level = NSWindow.Level(Int(CGWindowLevelForKey(.desktopWindow)))
+//                
+//                window.setFrame(NSRect(origin: .zero,
+//                                                     size: CGSize(width: NSScreen.main!.visibleFrame.size.width,
+//                                                                  height: NSScreen.main!.visibleFrame.size.height + NSScreen.main!.visibleFrame.origin.y + 1)
+//                                                    ),
+//                                              display: true)
+//                window.isMovable = false
+//                window.titlebarAppearsTransparent = true
+//                window.titleVisibility = .hidden
+//                window.canHide = false
+//                window.collectionBehavior = .stationary
+//            }
+//        }
     }
     
     func applicationWillTerminate(_ notification: Notification) {
@@ -91,27 +95,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     @MainActor @objc func toggleFilter() {
         self.contentViewModel.isFilterReveal.toggle()
-    }
-    
-// MARK: Set Settings Window
-    func setSettingsWindow() {
-        self.settingsWindow = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 480, height: 300),
-            styleMask: [.titled, .closable, .resizable, .fullSizeContentView],
-            backing: .buffered, defer: false)
-        self.settingsWindow.title = "Settings"
-        self.settingsWindow.isReleasedWhenClosed = false
-        self.settingsWindow.toolbarStyle = .preference
-        
-        self.settingsWindow.delegate = self
-        
-        let toolbar = NSToolbar(identifier: "SettingsToolbar")
-        toolbar.delegate = self
-        
-        toolbar.selectedItemIdentifier = SettingsToolbarIdentifiers.performance
-        
-        self.settingsWindow.toolbar = toolbar
-        self.settingsWindow.contentView = NSHostingView(rootView: SettingsView().environmentObject(self.globalSettingsViewModel))
     }
     
 // MARK: Set Wallpaper Window - Most efforts
@@ -225,11 +208,4 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             return
         }
     }
-}
-
-enum SettingsToolbarIdentifiers {
-    static let performance = NSToolbarItem.Identifier(rawValue: "performance")
-    static let general = NSToolbarItem.Identifier(rawValue: "general")
-    static let plugins = NSToolbarItem.Identifier(rawValue: "plugins")
-    static let about = NSToolbarItem.Identifier(rawValue: "about")
 }

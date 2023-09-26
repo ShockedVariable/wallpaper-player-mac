@@ -32,23 +32,6 @@ class WallpaperViewModel: ObservableObject {
     
     var lastPlayRate: Float = 1.0
     @Published public var playRate: Float = 1.0 {
-        willSet {
-            if newValue == 0.0 {
-                for (index, item) in AppDelegate.shared.statusItem.menu!.items.enumerated() {
-                    if item.title == "Pause" {
-                        AppDelegate.shared.statusItem.menu!.items[index] =
-                            .init(title: "Resume", systemImage: "play.fill", action: #selector(AppDelegate.shared.resume), keyEquivalent: "")
-                    }
-                }
-            } else {
-                for (index, item) in AppDelegate.shared.statusItem.menu!.items.enumerated() {
-                    if item.title == "Resume" {
-                        AppDelegate.shared.statusItem.menu!.items[index] =
-                            .init(title: "Pause", systemImage: "pause.fill", action: #selector(AppDelegate.shared.pause), keyEquivalent: "")
-                    }
-                }
-            }
-        }
         didSet {
             self.lastPlayRate = oldValue
         }
@@ -56,23 +39,6 @@ class WallpaperViewModel: ObservableObject {
     
     var lastPlayVolume: Float = 1.0
     @Published public var playVolume: Float = 1.0 {
-        willSet {
-            if newValue == 0.0 {
-                for (index, item) in AppDelegate.shared.statusItem.menu!.items.enumerated() {
-                    if item.title == "Mute" {
-                        AppDelegate.shared.statusItem.menu!.items[index] =
-                            .init(title: String(localized: "Unmute"), systemImage: "speaker.fill", action: #selector(AppDelegate.shared.unmute), keyEquivalent: "")
-                    }
-                }
-            } else {
-                for (index, item) in AppDelegate.shared.statusItem.menu!.items.enumerated() {
-                    if item.title == "Unmute" {
-                        AppDelegate.shared.statusItem.menu!.items[index] =
-                            .init(title: String(localized: "Mute"), systemImage: "speaker.slash.fill", action: #selector(AppDelegate.shared.mute), keyEquivalent: "")
-                    }
-                }
-            }
-        }
         didSet {
             self.lastPlayVolume = oldValue
         }

@@ -374,6 +374,9 @@
         }
       }
     },
+    "Baidu" : {
+
+    },
     "Basic Setup" : {
       "localizations" : {
         "zh-Hans" : {
@@ -418,6 +421,7 @@
       }
     },
     "Browse Workshop" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -790,6 +794,9 @@
         }
       }
     },
+    "GitHub" : {
+
+    },
     "Group" : {
       "localizations" : {
         "zh-Hans" : {
@@ -801,9 +808,6 @@
       }
     },
     "HEllo" : {
-
-    },
-    "Hello, world!" : {
 
     },
     "Hello, World!" : {
@@ -1567,6 +1571,7 @@
       }
     },
     "Recent Wallpapers" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1838,6 +1843,7 @@
       }
     },
     "Show Open Wallpaper Engine" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1847,7 +1853,7 @@
         }
       }
     },
-    "Show Wallpaper Studio" : {
+    "Show Wallpaper" : {
 
     },
     "Similar UI Layout to Wallpaper Engine on Steam" : {
@@ -1935,6 +1941,7 @@
       }
     },
     "Support & FAQ" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2077,6 +2084,7 @@
       }
     },
     "Unmute" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
