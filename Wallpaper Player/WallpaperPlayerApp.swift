@@ -9,19 +9,19 @@ import SwiftUI
 import WebKit
 
 @main
-struct WallpaperStudioApp: App {
+struct WallpaperPlayerApp: App {
     
     @NSApplicationDelegateAdaptor private var appDelegate: AppDelegate
     
-    @Environment(\.openWindow) public var openWindow
-    @Environment(\.scenePhase) var scenePhase
+    @Environment(\.openWindow) private var openWindow
+    @Environment(\.scenePhase) private var scenePhase
     
-    @StateObject var globalSettings = GlobalSettingsViewModel()
-    @StateObject var wallpaper = WallpaperViewModel()
+    @StateObject private var globalSettings = GlobalSettingsViewModel()
+    @StateObject private var wallpaper = WallpaperViewModel()
     
     var body: some Scene {
         
-        /// Main Window, which displays all contents relative to wallpapers' playback & control
+        /// The main window, which serves all the contents relative to wallpapers' playback & control
         Window("Wallpaper Studio", id: "main-window") {
             ContentView(wallpaperViewModel: wallpaper)
                 .environmentObject(globalSettings)
@@ -32,33 +32,20 @@ struct WallpaperStudioApp: App {
             WallpaperView(viewModel: wallpaper)
         }
         
-        // Show Wiki Page on GitHub
+        /// Represents wiki pages on GitHub
         Window("Support Documentation", id: "support-documentation") {
             DocsView()
         }
         .keyboardShortcut("0", modifiers: [.command, .shift])
         
-        // Settings View
+        /// View that represents global settings.
         Settings {
             SettingsView()
                 .environmentObject(globalSettings)
         }
         
-        // Status Bar Icon & Menu
-        MenuBarExtra {
-            Group {
-                Button {
-                    openWindow(id: "wallpaper-window")
-                } label: {
-                    Label("Show Wallpaper", systemImage: "photo")
-                }
-                
-                Text("World!")
-            }
-            .labelStyle(.titleAndIcon)
-        } label: {
-            Image(systemName: "display")
-        }
+        /// Status Bar Icon & Menu.
+        StatusBar()
     }
 }
 
@@ -100,5 +87,6 @@ struct DocsPageView: NSViewRepresentable {
 }
 
 #Preview {
-    DocsView()
+    ContentView(wallpaperViewModel: WallpaperViewModel())
+        .environmentObject(GlobalSettingsViewModel())
 }

@@ -13,6 +13,11 @@ protocol SubviewOfContentView: View {
 //    init(contentViewModel viewModel: ContentViewModel)
 }
 
+struct NavigationLinkContent: Hashable {
+    var title: String
+    var systemImage: String
+}
+
 struct ContentView: View {
     @EnvironmentObject var globalSettingsViewModel: GlobalSettingsViewModel
     
@@ -23,6 +28,26 @@ struct ContentView: View {
     @StateObject var viewModel = ContentViewModel()
     
     @ObservedObject var wallpaperViewModel: WallpaperViewModel
+    
+    private let navigations = [
+        [
+            NavigationLinkContent(title: "Browse", systemImage: "square.grid.2x2"),
+        ], 
+        [
+            NavigationLinkContent(title: "Recently Added", systemImage: "clock.fill"),
+            NavigationLinkContent(title: "Authors", systemImage: "person.bubble.fill"),
+            NavigationLinkContent(title: "Albums", systemImage: "photo.stack.fill"),
+            NavigationLinkContent(title: "Wallpapers", systemImage: "photo.fill"),
+            NavigationLinkContent(title: "Genres", systemImage: "guitars.fill"),
+            NavigationLinkContent(title: "Favorites", systemImage: "star.fill")
+        ], 
+        [
+            NavigationLinkContent(title: "All Playlists", systemImage: "square.grid.3x3"),
+            NavigationLinkContent(title: "Anime Waifu", systemImage: "music.note.list")
+        ]
+    ]
+    
+    @AppStorage("ContentViewNavigator") var navigator: String = "Recently Added"
     
     @State var isDropTargeted = false
     @State var isParseFinished = false
@@ -36,48 +61,34 @@ struct ContentView: View {
     
     var body: some View {
         NavigationSplitView {
-            List {
+            List(selection: $navigator) {
                 Section("Workshop") {
-                    NavigationLink {
-                        WallpaperExplorer(contentViewModel: viewModel, wallpaperViewModel: wallpaperViewModel)
-                            .background(Color(nsColor: .controlBackgroundColor))
-                    } label: {
-                        Label("Browse", systemImage: "square.grid.2x2")
+                    ForEach(navigations[0], id: \.title) { link in
+                        NavigationLink(value: link.title) {
+                            Label(link.title, systemImage: link.systemImage)
+                        }
                     }
                 }
                 
                 Section("Library") {
-                    NavigationLink {
-                        EmptyView()
-                    } label: {
-                        Label("Installed", systemImage: "square.and.arrow.down.fill")
-                    }
-                    NavigationLink {
-                        WallpaperExplorer(contentViewModel: viewModel, wallpaperViewModel: wallpaperViewModel)
-                            .background(Color(nsColor: .controlBackgroundColor))
-                    } label: {
-                        Label("Discover", systemImage: "sparkle.magnifyingglass")
-                    }
-                    NavigationLink {
-                        WallpaperExplorer(contentViewModel: viewModel, wallpaperViewModel: wallpaperViewModel)
-                            .background(Color(nsColor: .controlBackgroundColor))
-                    } label: {
-                        Label("Workshop", systemImage: "cloud.fill")
+                    ForEach(navigations[1], id: \.title) { link in
+                        NavigationLink(value: link.title) {
+                            Label(link.title, systemImage: link.systemImage)
+                        }
                     }
                 }
                 
                 Section("Playlists") {
-                    NavigationLink {
-                        WallpaperExplorer(contentViewModel: viewModel, wallpaperViewModel: wallpaperViewModel)
-                            .background(Color(nsColor: .controlBackgroundColor))
-                    } label: {
-                        Label("All Playlists", systemImage: "square.grid.3x3")
+                    ForEach(navigations[2], id: \.title) { link in
+                        NavigationLink(value: link.title) {
+                            Label(link.title, systemImage: link.systemImage)
+                        }
                     }
                 }
                 .tint(.secondary)
             }
             .searchable(text: $greet, placement: .sidebar)
-            
+            .navigationSplitViewColumnWidth(min: 200, ideal: 200, max: 500)
         } detail: {
             WallpaperExplorer(contentViewModel: viewModel, wallpaperViewModel: wallpaperViewModel)
                 .background(Color(nsColor: .controlBackgroundColor))
@@ -113,6 +124,7 @@ struct ContentView: View {
                     }
                     
                 }
+            Text(navigator)
         }
         .presentedWindowToolbarStyle(.unifiedCompact(showsTitle: false))
         .toolbar {

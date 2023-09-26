@@ -421,7 +421,6 @@
       }
     },
     "Browse Workshop" : {
-      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1571,7 +1570,6 @@
       }
     },
     "Recent Wallpapers" : {
-      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1853,7 +1851,7 @@
         }
       }
     },
-    "Show Wallpaper" : {
+    "Show Wallpaper Player" : {
 
     },
     "Similar UI Layout to Wallpaper Engine on Steam" : {
@@ -1941,7 +1939,6 @@
       }
     },
     "Support & FAQ" : {
-      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2330,9 +2327,6 @@
           }
         }
       }
-    },
-    "World!" : {
-
     },
     "You are about to open an external %@ as a wallpaper:" : {
       "localizations" : {

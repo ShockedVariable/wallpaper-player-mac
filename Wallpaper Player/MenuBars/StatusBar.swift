@@ -6,6 +6,69 @@
 //
 
 import Cocoa
+import SwiftUI
+
+struct StatusBar: Scene {
+    
+    @Environment(\.openWindow) private var openWindow
+    
+    var body: some Scene {
+        MenuBarExtra {
+            Group {
+                Section {
+                    Button {
+                        openWindow(id: "main-window")
+                    } label: {
+                        Label("Show Wallpaper Player", systemImage: "photo")
+                    }
+                    Menu("Recent Wallpapers") {
+                        
+                    }
+                }
+                Section {
+                    Button {
+                        openWindow(id: "wallpaper-window")
+                    } label: {
+                        Label("Browse Workshop", systemImage: "global")
+                    }
+                    Button {
+                        openWindow(id: "settings")
+                    } label: {
+                        Label("Settings", systemImage: "gear.fill")
+                    }
+                }
+                Section {
+                    Button {
+                        openWindow(id: "support-documentation")
+                    } label: {
+                        Label("Support & FAQ", systemImage: "person.fill.questionmark")
+                    }
+                }
+                Section {
+                    Button {
+                        
+                    } label: {
+                        Label("Mute", systemImage: "speaker.slash.fill")
+                    }
+                    Button {
+                        
+                    } label: {
+                        Label("Pause", systemImage: "pause.fill")
+                    }
+                    Button {
+                        NSApp.stop(nil)
+                    } label: {
+                        Label("Quit", systemImage: "power")
+                    }
+                }
+            }
+            .labelStyle(.titleAndIcon)
+        } label: {
+            Image(systemName: "display")
+        }
+    }
+}
+
 
 extension AppDelegate {
     @objc func mute() {

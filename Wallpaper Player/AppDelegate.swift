@@ -34,10 +34,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         saveCurrentWallpaper()
         AppDelegate.shared.setPlacehoderWallpaper(with: wallpaperViewModel.currentWallpaper)
         
-        setWallpaperWindow()
-        
-        wallpaperWindow.orderFront(nil)
-        
+//        setWallpaperWindow()
+//        
+//        wallpaperWindow.orderFront(nil)
+//        
 //        for window in NSApp.windows {
 //            if window.title == "Wallpaper" {
 //                window.styleMask = [.borderless, .fullSizeContentView]
