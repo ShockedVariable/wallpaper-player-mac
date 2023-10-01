@@ -105,6 +105,9 @@
     "%@" : {
 
     },
+    "%lld" : {
+
+    },
     "×8 MSAA is only recommended for powerful high-end desktop graphics cards." : {
       "localizations" : {
         "zh-Hans" : {
@@ -150,6 +153,9 @@
           }
         }
       }
+    },
+    "84 ALBUMS, 445 SONGS" : {
+
     },
     "2048x2048 MacBook Pro 14''" : {
       "localizations" : {
@@ -258,10 +264,10 @@
         }
       }
     },
-    "All Playlists" : {
+    "Animates" : {
 
     },
-    "Animates" : {
+    "Anime" : {
 
     },
     "Anti-aliasing" : {
@@ -396,9 +402,6 @@
           }
         }
       }
-    },
-    "Browse" : {
-
     },
     "Browse All By" : {
       "localizations" : {
@@ -806,7 +809,7 @@
         }
       }
     },
-    "HEllo" : {
+    "Hello" : {
 
     },
     "Hello, World!" : {
@@ -1105,6 +1108,9 @@
           }
         }
       }
+    },
+    "Monitor" : {
+
     },
     "Move to Trash" : {
       "localizations" : {
@@ -1497,6 +1503,9 @@
         }
       }
     },
+    "Pro Display XDR" : {
+
+    },
     "Proceed" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1728,6 +1737,9 @@
           }
         }
       }
+    },
+    "Retina XDR Display" : {
+
     },
     "Safe start after hibernation" : {
       "extractionState" : "stale",
@@ -1990,6 +2002,9 @@
     "Those all settings above don't have to be saved for taking effect." : {
 
     },
+    "Title" : {
+
+    },
     "Titles per page" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2237,6 +2252,9 @@
           }
         }
       }
+    },
+    "Wallpapers" : {
+
     },
     "Wallpapers in Folders" : {
       "localizations" : {

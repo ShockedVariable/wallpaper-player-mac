@@ -5,6 +5,8 @@
 //  Created by Haren on 2023/8/8.
 //
 
+// MARK: - Deprecated
+
 import Cocoa
 
 extension AppDelegate {

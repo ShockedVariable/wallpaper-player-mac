@@ -13,9 +13,72 @@ protocol SubviewOfContentView: View {
 //    init(contentViewModel viewModel: ContentViewModel)
 }
 
-struct NavigationLinkContent: Hashable {
+struct NavigationLinkContent: Hashable, RawRepresentable, Codable {
+    
+    init(title: String, systemImage: String, placement: NavigationLinkContentPlacement = .none) {
+        self.title = title
+        self.systemImage = systemImage
+        self.placement = placement
+    }
+    
+    init?(rawValue: String) {
+        let decoder = JSONDecoder()
+        
+        if let rawValueData = rawValue.data(using: .utf8),
+           let new = try? decoder.decode(Self.self, from: rawValueData) {
+            self = new
+        } else {
+            return nil
+        }
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.title = try container.decode(String.self, forKey: .title)
+        self.systemImage = try container.decode(String.self, forKey: .systemImage)
+        self.placement = try container.decode(NavigationLinkContentPlacement.self, forKey: .placement)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(title, forKey: .title)
+        try container.encode(systemImage, forKey: .systemImage)
+        try container.encode(placement, forKey: .placement)
+        // <and so on>
+    }
+    
+    var rawValue: String {
+        let encoder = JSONEncoder()
+        
+        encoder.outputFormatting = .sortedKeys
+        
+        do {
+            let rawValueData = try encoder.encode(self)
+            return String(data: rawValueData, encoding: .utf8)!
+        } catch {
+            print(error)
+            return ""
+        }
+    }
+    
     var title: String
     var systemImage: String
+    
+    var placement: NavigationLinkContentPlacement
+    
+    enum CodingKeys: CodingKey {
+        case title
+        case systemImage
+        case placement
+        // <all the other elements too>
+    }
+    
+    enum NavigationLinkContentPlacement: Codable {
+        case workshop
+        case recent, author, album, genre, table, favorite
+        case allPlaylists, playlist
+        case none
+    }
 }
 
 struct ContentView: View {
@@ -29,25 +92,27 @@ struct ContentView: View {
     
     @ObservedObject var wallpaperViewModel: WallpaperViewModel
     
-    private let navigations = [
-        [
-            NavigationLinkContent(title: "Browse", systemImage: "square.grid.2x2"),
-        ], 
-        [
-            NavigationLinkContent(title: "Recently Added", systemImage: "clock.fill"),
-            NavigationLinkContent(title: "Authors", systemImage: "person.bubble.fill"),
-            NavigationLinkContent(title: "Albums", systemImage: "photo.stack.fill"),
-            NavigationLinkContent(title: "Wallpapers", systemImage: "photo.fill"),
-            NavigationLinkContent(title: "Genres", systemImage: "guitars.fill"),
-            NavigationLinkContent(title: "Favorites", systemImage: "star.fill")
-        ], 
-        [
-            NavigationLinkContent(title: "All Playlists", systemImage: "square.grid.3x3"),
-            NavigationLinkContent(title: "Anime Waifu", systemImage: "music.note.list")
-        ]
+    private let workshopRows = [
+        NavigationLinkContent(title: "Browse", systemImage: "square.grid.2x2", placement: .workshop)
     ]
     
-    @AppStorage("ContentViewNavigator") var navigator: String = "Recently Added"
+    private let libraryRows = [
+        NavigationLinkContent(title: "Recently Added", systemImage: "clock.fill", placement: .recent),
+        NavigationLinkContent(title: "Authors", systemImage: "person.bubble.fill", placement: .author),
+        NavigationLinkContent(title: "Wallpapers", systemImage: "photo.fill", placement: .table),
+        NavigationLinkContent(title: "Genres", systemImage: "guitars.fill", placement: .genre),
+        NavigationLinkContent(title: "Favorites", systemImage: "star.fill", placement: .favorite)
+    ]
+    
+    var playlistRows: [NavigationLinkContent] {
+//        var rows = [NavigationLinkContent(title: "Anime Waifu", systemImage: "music.note.list")]
+        [NavigationLinkContent(title: "All Playlists", systemImage: "square.grid.3x3", placement: .allPlaylists)]
+    }
+    
+    @AppStorage("ContentViewNavigator") var navigator =
+    NavigationLinkContent(title: "Recently Added",
+                          systemImage: "clock.fill",
+                          placement: .recent)
     
     @State var isDropTargeted = false
     @State var isParseFinished = false
@@ -58,39 +123,40 @@ struct ContentView: View {
     @State var project: WEProject!
     @State var projectUrl: URL!
     @State var greet: String = "Hello, world!"
-    
+
     var body: some View {
         NavigationSplitView {
             List(selection: $navigator) {
                 Section("Workshop") {
-                    ForEach(navigations[0], id: \.title) { link in
-                        NavigationLink(value: link.title) {
+                    ForEach(workshopRows, id: \.title) { link in
+                        NavigationLink(value: link) {
                             Label(link.title, systemImage: link.systemImage)
                         }
                     }
                 }
                 
                 Section("Library") {
-                    ForEach(navigations[1], id: \.title) { link in
-                        NavigationLink(value: link.title) {
+                    ForEach(libraryRows, id: \.title) { link in
+                        NavigationLink(value: link) {
                             Label(link.title, systemImage: link.systemImage)
                         }
                     }
                 }
                 
                 Section("Playlists") {
-                    ForEach(navigations[2], id: \.title) { link in
-                        NavigationLink(value: link.title) {
+                    ForEach(playlistRows, id: \.title) { link in
+                        NavigationLink(value: link) {
                             Label(link.title, systemImage: link.systemImage)
                         }
                     }
                 }
                 .tint(.secondary)
             }
-            .searchable(text: $greet, placement: .sidebar)
-            .navigationSplitViewColumnWidth(min: 200, ideal: 200, max: 500)
+//            .searchable(text: $greet, placement: .sidebar)
+            .navigationSplitViewColumnWidth(200)
         } detail: {
             WallpaperExplorer(contentViewModel: viewModel, wallpaperViewModel: wallpaperViewModel)
+                .navigationTitle("")
                 .background(Color(nsColor: .controlBackgroundColor))
                 .overlay(alignment: .topTrailing) {
                     if isDetailReveal {
@@ -124,11 +190,14 @@ struct ContentView: View {
                     }
                     
                 }
-            Text(navigator)
+                .frame(minWidth: 900, minHeight: 500)
         }
-        .presentedWindowToolbarStyle(.unifiedCompact(showsTitle: false))
         .toolbar {
-            ToolbarItemGroup(placement: .cancellationAction) {
+            ToolbarItemGroup(placement: .navigation) {
+                Picker("Monitor", selection: .constant(0)) {
+                    Text("Retina XDR Display").tag(0)
+                    Text("Pro Display XDR").tag(1)
+                }
                 Button {
                     
                 } label: {
@@ -145,49 +214,69 @@ struct ContentView: View {
                     Image(systemName: "forward.fill")
                 }
             }
-            ToolbarItem {
-                Spacer()
-            }
-            ToolbarItem {
-                HStack {
-                    VStack {
-                        Spacer()
-                        Text("HEllo")
-                        Spacer()
+            
+            ToolbarItem(placement: .principal) {
+                GeometryReader { proxy in
+                    HStack(spacing: 0) {
+                        GifImage(contentsOf: { (url: URL) in
+                            if let selectedProject = try? JSONDecoder()
+                                .decode(WEProject.self, from: Data(contentsOf: url.appending(path: "project.json"))) {
+                                return url.appending(path: selectedProject.preview)
+                            }
+                            return Bundle.main.url(forResource: "WallpaperNotFound", withExtension: "mp4")!
+                        }(wallpaperViewModel.currentWallpaper.wallpaperDirectory))
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .padding(1)
+                        .frame(width: proxy.size.height,
+                               height: proxy.size.height)
+                        VStack {
+                            Text(wallpaperViewModel.currentWallpaper.project.title)
+                            Text("< Placeholder >")
+                                .fontWeight(.light)
+                                .foregroundStyle(.secondary)
+                        }
+                        .font(.system(size: 12))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Material.ultraThin)
                     }
                 }
-                .frame(width: 200)
+                .frame(width: 300, height: 40)
                 .border(Color(nsColor: NSColor.separatorColor))
             }
-            ToolbarItem {
-                Slider(value: $wallpaperViewModel.playVolume,
-                       in: 0...1) {
-                    Text("EHEHE")
-                } minimumValueLabel: {
+            
+            ToolbarItemGroup(placement: .automatic) {
+                Spacer()
+                
+                HStack {
+                    Slider(value: $wallpaperViewModel.playVolume,
+                           in: 0...1) {
+                        Text("EHEHE")
+                    } minimumValueLabel: {
+                        Button {
+                            
+                        } label: {
+                            Image(systemName: "speaker.fill")
+                                .imageScale(.small)
+                        }
+                    } maximumValueLabel: {
+                        Button {
+                            
+                        } label: {
+                            Image(systemName: "speaker.wave.3.fill")
+                                .imageScale(.small)
+                        }
+                    }
+                    .controlSize(.mini)
+                    .frame(width: 110)
+                    
                     Button {
-                        
+                        withAnimation(.spring()) {
+                            isDetailReveal.toggle()
+                        }
                     } label: {
-                        Image(systemName: "speaker.fill")
-                            .imageScale(.small)
+                        Image(systemName: "list.bullet")
                     }
-                } maximumValueLabel: {
-                    Button {
-                        
-                    } label: {
-                        Image(systemName: "speaker.wave.3.fill")
-                            .imageScale(.small)
-                    }
-                }
-                .controlSize(.mini)
-                .frame(width: 110)
-            }
-            ToolbarItem {
-                Button {
-                    withAnimation(.spring()) {
-                        isDetailReveal.toggle()
-                    }
-                } label: {
-                    Image(systemName: "list.bullet")
                 }
             }
         }
