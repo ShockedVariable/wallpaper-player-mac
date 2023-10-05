@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// Provide Wallpaper Database for WallpaperView and ContentView etc.
-class WallpaperViewModel: ObservableObject {
+final class WallpaperViewModel: ObservableObject {
     @Published var nextCurrentWallpaper: WEWallpaper =
     WEWallpaper(using: .invalid, where: Bundle.main.url(forResource: "WallpaperNotFound", withExtension: "mp4")!) {
         willSet {

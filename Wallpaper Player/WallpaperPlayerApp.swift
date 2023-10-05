@@ -8,7 +8,7 @@
 import SwiftUI
 import WebKit
 
-@main
+
 struct WallpaperPlayerApp: App {
     
     @NSApplicationDelegateAdaptor private var appDelegate: AppDelegate
@@ -23,9 +23,11 @@ struct WallpaperPlayerApp: App {
         
         /// The main window, which serves all the contents relative to wallpapers' playback & control
         Window("Wallpaper Studio", id: "main-window") {
-            ContentView(wallpaperViewModel: wallpaper)
-                .environmentObject(globalSettings)
+//            ContentView(wallpaperViewModel: wallpaper)
+//                .environmentObject(globalSettings)
+            Text("Hello, world!")
         }
+        .windowStyle(.hiddenTitleBar)
         .keyboardShortcut("1", modifiers: [.command, .shift])
         
         WindowGroup("Wallpaper", id: "wallpaper-window") {

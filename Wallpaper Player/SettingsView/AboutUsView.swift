@@ -19,6 +19,14 @@ extension AppDelegate {
     }
 }
 
+@MainActor
+class AboutUsViewController: NSHostingController<AboutUsView> {
+    @MainActor
+    required init?(coder decoder: NSCoder) {
+        super.init(coder: decoder, rootView: AboutUsView())
+    }
+}
+
 struct AboutUsView: View {
     var body: some View {
         VStack(spacing: 50) {

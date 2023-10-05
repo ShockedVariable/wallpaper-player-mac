@@ -8,7 +8,7 @@
 import Cocoa
 import SwiftUI
 
-class MainWindowController: NSWindowController, NSWindowDelegate {
+class MainWindowController_old: NSWindowController, NSWindowDelegate {
     override var window: NSWindow! {
         get {
             return super.window

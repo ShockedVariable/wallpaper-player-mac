@@ -150,9 +150,9 @@ class GlobalSettingsViewModel: ObservableObject {
         NotificationCenter.default.publisher(for: NSWorkspace.didActivateApplicationNotification)
             .sink { [weak self] _ in self?.activateApplicationDidChange() }
         
-        self.didCurrentWallpaperChangeCancellable =
-        AppDelegate.shared.wallpaperViewModel.$currentWallpaper
-            .sink { [weak self] in self?.didCurrentWallpaperChange($0) }
+//        self.didCurrentWallpaperChangeCancellable =
+//        AppDelegate.shared.wallpaperViewModel.$currentWallpaper
+//            .sink { [weak self] in self?.didCurrentWallpaperChange($0) }
         
         self.didAddToLoginItemCancellable =
         self.$settings
@@ -160,11 +160,11 @@ class GlobalSettingsViewModel: ObservableObject {
             .map { $0.autoStart }
             .sink { [weak self] in self?.didAddToLoginItem($0) }
         
-        self.didChangeAdjustMenuBarTintCancellable =
-        self.$settings
-            .removeDuplicates { $0.adjustMenuBarTint == $1.adjustMenuBarTint }
-            .map { $0.adjustMenuBarTint }
-            .sink { [weak self] in self?.didChangeAdjustMenuBarTint($0) }
+//        self.didChangeAdjustMenuBarTintCancellable =
+//        self.$settings
+//            .removeDuplicates { $0.adjustMenuBarTint == $1.adjustMenuBarTint }
+//            .map { $0.adjustMenuBarTint }
+//            .sink { [weak self] in self?.didChangeAdjustMenuBarTint($0) }
             
         
         self.validate()

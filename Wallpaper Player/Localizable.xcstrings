@@ -812,6 +812,9 @@
     "Hello" : {
 
     },
+    "Hello, world!" : {
+
+    },
     "Hello, World!" : {
       "localizations" : {
         "zh-Hans" : {

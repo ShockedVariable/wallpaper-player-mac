@@ -10,12 +10,13 @@ import SwiftUI
 import AVKit
 import WebKit
 
+@main
 class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     var statusItem: NSStatusItem!
     var settingsWindow: NSWindow!
     
-    var mainWindowController: MainWindowController!
+    var mainWindowController: MainWindowController_old!
     
     var wallpaperWindow: NSWindow!
     
@@ -31,8 +32,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
 // MARK: - delegate methods
     func applicationDidFinishLaunching(_ notification: Notification) {
-        saveCurrentWallpaper()
-        AppDelegate.shared.setPlacehoderWallpaper(with: wallpaperViewModel.currentWallpaper)
+        let storyboard = NSStoryboard(name: "Main", bundle: .main)
+        if let windowController = storyboard.instantiateController(withIdentifier: "WallpaperWindowController") as? NSWindowController {
+          windowController.showWindow(self)
+        }
+//        saveCurrentWallpaper()
+//        AppDelegate.shared.setPlacehoderWallpaper(with: wallpaperViewModel.currentWallpaper)
         
 //        setWallpaperWindow()
 //        
@@ -57,28 +62,28 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 //        }
     }
     
-    func applicationWillTerminate(_ notification: Notification) {
-        if let wallpaper = UserDefaults.standard.url(forKey: "OSWallpaper") {
-            try? NSWorkspace.shared.setDesktopImageURL(wallpaper, for: .main!)
-        }
-        
-        let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-        do {
-            let filesURL = try FileManager.default.contentsOfDirectory(at: cacheDirectory,
-                                                                       includingPropertiesForKeys: nil,
-                                                                       options: .skipsHiddenFiles)
-            for url in filesURL {
-                if url.lastPathComponent.contains("staticWP") {
-                    try FileManager.default.removeItem(at: url)
-                }
-            }
-        } catch {
-            print(error)
-        }
-    }
+//    func applicationWillTerminate(_ notification: Notification) {
+//        if let wallpaper = UserDefaults.standard.url(forKey: "OSWallpaper") {
+//            try? NSWorkspace.shared.setDesktopImageURL(wallpaper, for: .main!)
+//        }
+//        
+//        let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+//        do {
+//            let filesURL = try FileManager.default.contentsOfDirectory(at: cacheDirectory,
+//                                                                       includingPropertiesForKeys: nil,
+//                                                                       options: .skipsHiddenFiles)
+//            for url in filesURL {
+//                if url.lastPathComponent.contains("staticWP") {
+//                    try FileManager.default.removeItem(at: url)
+//                }
+//            }
+//        } catch {
+//            print(error)
+//        }
+//    }
     
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        return false
+        return true
     }
 
 // MARK: - misc methods
