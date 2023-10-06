@@ -151,7 +151,7 @@ class GlobalSettingsViewModel: ObservableObject {
             .sink { [weak self] _ in self?.activateApplicationDidChange() }
         
         self.didCurrentWallpaperChangeCancellable =
-        AppDelegate.shared.wallpaperViewModel.$currentWallpaper
+        appDelegate.wallpaperViewModel.$currentWallpaper
             .sink { [weak self] in self?.didCurrentWallpaperChange($0) }
         
         self.didAddToLoginItemCancellable =
@@ -190,7 +190,7 @@ class GlobalSettingsViewModel: ObservableObject {
             }
         } else {
             do {
-                let url = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appending(path: "staticWP_\(AppDelegate.shared.wallpaperViewModel.currentWallpaper.wallpaperDirectory.hashValue).tiff")
+                let url = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appending(path: "staticWP_\(appDelegate.wallpaperViewModel.currentWallpaper.wallpaperDirectory.hashValue).tiff")
                 try NSWorkspace.shared.setDesktopImageURL(url, for: .main!)
             } catch {
                 print(error)
@@ -199,7 +199,7 @@ class GlobalSettingsViewModel: ObservableObject {
     }
     
     func didCurrentWallpaperChange(_ newValue: WEWallpaper) {
-        AppDelegate.shared.setPlacehoderWallpaper(with: newValue)
+        appDelegate.setPlacehoderWallpaper(with: newValue)
     }
     
     func reset() {
@@ -267,9 +267,9 @@ class GlobalSettingsViewModel: ObservableObject {
         default:
             switch self.settings.otherApplicationFocused {
             case .mute:
-                AppDelegate.shared.mute()
+                appDelegate.mute()
             case .pause:
-                AppDelegate.shared.pause()
+                appDelegate.pause()
             case .keepRunning:
                 fallthrough
             default:
@@ -281,9 +281,9 @@ class GlobalSettingsViewModel: ObservableObject {
     func globalSettingsWhenApplicationDidBecomeActive() {
         switch self.settings.otherApplicationFocused {
         case .mute:
-            AppDelegate.shared.unmute()
+            appDelegate.unmute()
         case .pause:
-            AppDelegate.shared.resume()
+            appDelegate.resume()
         case .keepRunning:
             fallthrough
         default:

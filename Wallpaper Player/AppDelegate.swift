@@ -32,7 +32,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 // MARK: - delegate methods
     func applicationDidFinishLaunching(_ notification: Notification) {
         saveCurrentWallpaper()
-        AppDelegate.shared.setPlacehoderWallpaper(with: wallpaperViewModel.currentWallpaper)
+        appDelegate.setPlacehoderWallpaper(with: wallpaperViewModel.currentWallpaper)
+        
+        mainWindowController = MainWindowController()
+        
+        mainWindowController.showWindow(self)
         
 //        setWallpaperWindow()
 //        

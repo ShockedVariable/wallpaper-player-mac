@@ -8,7 +8,7 @@
 import SwiftUI
 import WebKit
 
-@main
+//@main
 struct WallpaperPlayerApp: App {
     
     @NSApplicationDelegateAdaptor private var appDelegate: AppDelegate

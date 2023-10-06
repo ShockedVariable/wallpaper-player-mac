@@ -34,7 +34,7 @@ extension AppDelegate {
         let importMenu = NSMenuItem(title: String(localized: "Import"), action: nil, keyEquivalent: "")
         importMenu.submenu = NSMenu()
         importMenu.submenu?.items = [
-            .init(title: String(localized: "Wallpaper from Folder"), action: #selector(openImportFromFolderPanel), keyEquivalent: "i"),
+//            .init(title: String(localized: "Wallpaper from Folder"), action: #selector(openImportFromFolderPanel), keyEquivalent: "i"),
             .init(title: String(localized: "Wallpapers in Folders"), action: nil, keyEquivalent: "")
         ]
         
@@ -45,7 +45,7 @@ extension AppDelegate {
             // 在此处添加子菜单项
             importMenu,
             .separator(),
-            .init(title: String(localized: "Close Window"), action: #selector(AppDelegate.shared.mainWindowController.window.performClose), keyEquivalent: "w")
+            .init(title: String(localized: "Close Window"), action: #selector(appDelegate.mainWindowController.window?.performClose), keyEquivalent: "w")
         ]
         
         // Edit Menu
@@ -74,7 +74,7 @@ extension AppDelegate {
             }(),
             .separator(),
             {
-                let item = NSMenuItem(title: String(localized: "Enter Full Screen"), action: #selector(AppDelegate.shared.mainWindowController.window.toggleFullScreen(_:)), keyEquivalent: "f")
+                let item = NSMenuItem(title: String(localized: "Enter Full Screen"), action: #selector(appDelegate.mainWindowController.window?.toggleFullScreen(_:)), keyEquivalent: "f")
                 item.keyEquivalentModifierMask = [.command, .control]
                 return item
             }()

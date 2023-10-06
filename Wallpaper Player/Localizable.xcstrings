@@ -2220,6 +2220,7 @@
       }
     },
     "Wallpaper from Folder" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {

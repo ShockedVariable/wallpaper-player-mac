@@ -9,60 +9,41 @@ import Cocoa
 import SwiftUI
 
 class MainWindowController: NSWindowController, NSWindowDelegate {
-    override var window: NSWindow! {
-        get {
-            return super.window
-        }
-        set {
-            super.window = newValue
-        }
-    }
     
-    override init(window: NSWindow?) {
-        super.init(window: NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 480, height: 300),
+    override func loadWindow() {
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 980, height: 580),
             styleMask: [.titled, .closable, .miniaturizable, .resizable],
-            backing: .buffered, defer: false))
-        self.window.delegate = self
-        self.window.isReleasedWhenClosed = false
-        self.window.title = "Open Wallpaper Engine \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String)"
-        self.window.titlebarAppearsTransparent = true
-        self.window.setFrameAutosaveName("MainWindow")
-        self.window.isMovableByWindowBackground = true
-        self.window.contentView = NSHostingView(rootView: ContentView(
-                viewModel: AppDelegate.shared.contentViewModel,
-                wallpaperViewModel: AppDelegate.shared.wallpaperViewModel
-            ).environmentObject(AppDelegate.shared.globalSettingsViewModel)
+            backing: .buffered, defer: false
         )
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        
+        window.windowController = self
+        window.delegate = self
+        
+        window.title = "Open Wallpaper Engine \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String)"
+        
+        self.window = window
     }
     
     override func windowDidLoad() {
         super.windowDidLoad()
+        
+        
     }
     
     func windowWillClose(_ notification: Notification) {
-        AppDelegate.shared.contentViewModel.isStaging = false
+        
     }
     
     func windowDidResignKey(_ notification: Notification) {
-//        if !AppDelegate.shared.contentViewModel.isDisplaySettingsReveal {
-//            AppDelegate.shared.contentViewModel.isStaging = false
-//        }
+        
     }
     
     func windowDidResignMain(_ notification: Notification) {
-//        AppDelegate.shared.contentViewModel.isStaging = false
+        
     }
     
     func windowDidBecomeKey(_ notification: Notification) {
-        DispatchQueue.main.async {
-            withAnimation {
-                AppDelegate.shared.contentViewModel.isStaging = true
-            }
-        }
+        
     }
 }
