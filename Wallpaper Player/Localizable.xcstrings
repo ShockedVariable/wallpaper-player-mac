@@ -185,6 +185,7 @@
       }
     },
     "About Open Wallpaper Engine" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -193,6 +194,9 @@
           }
         }
       }
+    },
+    "About Wallpaper Player" : {
+
     },
     "Add to Favorites" : {
       "localizations" : {
@@ -810,6 +814,9 @@
       }
     },
     "Hello" : {
+
+    },
+    "Hello, world!" : {
 
     },
     "Hello, World!" : {

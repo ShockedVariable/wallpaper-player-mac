@@ -123,7 +123,7 @@ extension AppDelegate {
         NSWorkspace.shared.open(URL(string: "https://github.com/haren724/open-wallpaper-engine-mac/wiki")!)
     }
     /*
-    func setStatusMenu() {
+    func loadStatusMenu() {
         // Recent Wallpapers Submenu
         let recentWallpapersMenuItem = NSMenuItem(title: String(localized: "Recent Wallpapers"), action: nil, keyEquivalent: "")
         let recentWallpapersMenu = NSMenu(title: String(localized: "Recent Wallpapers"))
@@ -205,5 +205,5 @@ extension AppDelegate {
             }
         }
     }
-     */
+    */
 }

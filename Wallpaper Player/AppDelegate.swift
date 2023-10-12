@@ -15,8 +15,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     var statusItem: NSStatusItem!
     var settingsWindow: NSWindow!
     
-    var mainWindowController: MainWindowController!
-    
+    let mainWindowController = MainWindowController()
+    let settingsWindowController = SettingsWindowController()
+
     var wallpaperWindow: NSWindow!
     
     var contentViewModel = ContentViewModel()
@@ -31,10 +32,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
 // MARK: - delegate methods
     func applicationDidFinishLaunching(_ notification: Notification) {
+        loadMainMenu()
+        
         saveCurrentWallpaper()
         appDelegate.setPlacehoderWallpaper(with: wallpaperViewModel.currentWallpaper)
-        
-        mainWindowController = MainWindowController()
         
         mainWindowController.showWindow(self)
         
