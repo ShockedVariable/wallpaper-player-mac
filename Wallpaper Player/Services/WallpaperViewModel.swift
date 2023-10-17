@@ -17,7 +17,7 @@ class WallpaperViewModel: ObservableObject {
                    trustedWallpapers.contains(newValue.wallpaperDirectory.path(percentEncoded: false)) {
                     self.currentWallpaper = newValue
                 } else {
-                    appDelegate.contentViewModel.warningUnsafeWallpaperModal(which: newValue)
+                    AppDelegate.shared.contentViewModel.warningUnsafeWallpaperModal(which: newValue)
                 }
             } else {
                 self.currentWallpaper = newValue

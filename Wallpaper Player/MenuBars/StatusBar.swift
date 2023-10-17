@@ -179,7 +179,7 @@ extension AppDelegate {
             
             .init(title: String(localized: "Mute"),
                   systemImage: "speaker.slash.fill",
-                  action: #selector(appDelegate.mute),
+                  action: #selector(AppDelegate.shared.mute),
                   keyEquivalent: "m"),
             
             .init(title: String(localized: "Pause"),

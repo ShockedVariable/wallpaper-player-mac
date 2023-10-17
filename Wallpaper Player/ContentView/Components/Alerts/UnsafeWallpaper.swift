@@ -54,14 +54,14 @@ struct UnsafeWallpaper: View {
             Divider()
             HStack {
                 Button {
-                    appDelegate.wallpaperViewModel.currentWallpaper =
-                    appDelegate.wallpaperViewModel.nextCurrentWallpaper
+                    AppDelegate.shared.wallpaperViewModel.currentWallpaper =
+                    AppDelegate.shared.wallpaperViewModel.nextCurrentWallpaper
                     
                     if isIgnored {
                         var trustedWallpapers =
                         UserDefaults.standard.array(forKey: "TrustedWallpapers") as? [String] ?? [String]()
                         
-                        trustedWallpapers.append(appDelegate.wallpaperViewModel.nextCurrentWallpaper.wallpaperDirectory.path(percentEncoded: false))
+                        trustedWallpapers.append(AppDelegate.shared.wallpaperViewModel.nextCurrentWallpaper.wallpaperDirectory.path(percentEncoded: false))
                         
                         UserDefaults.standard.set(trustedWallpapers, forKey: "TrustedWallpapers")
                     }

@@ -91,6 +91,8 @@ class MainWindowController: NSWindowController, NSWindowDelegate, NSToolbarDeleg
             picker.addItem(withTitle: "Built-in Liquid Retina XDR Display")
             picker.addItem(withTitle: "X401R")
             
+            picker.bezelStyle = .toolbar
+            
             toolbarItem.view = picker
         case .togglePreview:
             toolbarItem.image = NSImage(systemSymbolName: "sidebar.trailing", accessibilityDescription: nil)

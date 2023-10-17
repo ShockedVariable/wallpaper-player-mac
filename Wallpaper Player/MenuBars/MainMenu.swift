@@ -5,20 +5,18 @@
 //  Created by Haren on 2023/8/8.
 //
 
-// MARK: - Deprecated
-
 import Cocoa
 
-extension AppDelegate {
-    func loadMainMenu() {
+extension NSMenu {
+    class func mainMenu() -> NSMenu {
         // 主菜单
         let appMenu = NSMenuItem()
         appMenu.submenu = NSMenu(title: "Wallpaper Player")
         appMenu.submenu?.items = [
             // 在此处添加子菜单项
-            .init(title: String(localized: "About Wallpaper Player"), action: #selector(self.showAboutUs), keyEquivalent: ""),
+            .init(title: String(localized: "About Wallpaper Player"), action: #selector(AppDelegate.shared.showAboutUs), keyEquivalent: ""),
             .separator(),
-            .init(title: String(localized: "Settings..."), action: #selector(openSettingsWindow), keyEquivalent: ","),
+            .init(title: String(localized: "Settings..."), action: #selector(AppDelegate.shared.openSettingsWindow), keyEquivalent: ","),
             .separator(),
             .init(title: String(localized: "Quit"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"),
             .separator(),
@@ -34,7 +32,7 @@ extension AppDelegate {
         let importMenu = NSMenuItem(title: String(localized: "Import"), action: nil, keyEquivalent: "")
         importMenu.submenu = NSMenu()
         importMenu.submenu?.items = [
-//            .init(title: String(localized: "Wallpaper from Folder"), action: #selector(openImportFromFolderPanel), keyEquivalent: "i"),
+//            .init(title: String(localized: "Wallpaper from Folder"), action: #selector(AppDelegate.sharedopenImportFromFolderPanel), keyEquivalent: "i"),
             .init(title: String(localized: "Wallpapers in Folders"), action: nil, keyEquivalent: "")
         ]
         
@@ -45,7 +43,7 @@ extension AppDelegate {
             // 在此处添加子菜单项
             importMenu,
             .separator(),
-            .init(title: String(localized: "Close Window"), action: #selector(appDelegate.mainWindowController.window?.performClose), keyEquivalent: "w")
+            .init(title: String(localized: "Close Window"), action: #selector(AppDelegate.shared.mainWindowController.window?.performClose), keyEquivalent: "w")
         ]
         
         // Edit Menu
@@ -68,13 +66,13 @@ extension AppDelegate {
         viewMenu.submenu = NSMenu(title: String(localized: "View"))
         viewMenu.submenu?.items = [
             {
-                let item = NSMenuItem(title: String(localized: "Show Filter Results"), action: #selector(self.toggleFilter), keyEquivalent: "s")
+                let item = NSMenuItem(title: String(localized: "Show Filter Results"), action: #selector(AppDelegate.shared.toggleFilter), keyEquivalent: "s")
                 item.keyEquivalentModifierMask = [.command, .control]
                 return item
             }(),
             .separator(),
             {
-                let item = NSMenuItem(title: String(localized: "Enter Full Screen"), action: #selector(appDelegate.mainWindowController.window?.toggleFullScreen(_:)), keyEquivalent: "f")
+                let item = NSMenuItem(title: String(localized: "Enter Full Screen"), action: #selector(AppDelegate.shared.mainWindowController.window?.toggleFullScreen(_:)), keyEquivalent: "f")
                 item.keyEquivalentModifierMask = [.command, .control]
                 return item
             }()
@@ -85,7 +83,7 @@ extension AppDelegate {
         windowMenu.submenu = NSMenu(title: String(localized: "Window"))
         windowMenu.submenu?.items = [
             {
-                let item = NSMenuItem(title: String(localized: "Wallpaper Explorer"), action: #selector(openMainWindow), keyEquivalent: "1")
+                let item = NSMenuItem(title: String(localized: "Wallpaper Explorer"), action: #selector(AppDelegate.shared.openMainWindow), keyEquivalent: "1")
                 item.keyEquivalentModifierMask = [.command, .shift]
                 return item
             }()
@@ -95,9 +93,9 @@ extension AppDelegate {
         let debugMenu = NSMenuItem(title: String(localized: "Debug"), action: nil, keyEquivalent: "")
         debugMenu.submenu = NSMenu()
         debugMenu.submenu?.items = [
-            .init(title: String(localized: "Reset First Launch"), action: #selector(resetFirstLaunch), keyEquivalent: ""),
-            .init(title: String(localized: "Toggle Desktop Wallpaper Window (Debug)"), action: #selector(toggleDesktopWallpaperWindow), keyEquivalent: ""),
-            .init(title: String(localized: "Reset All Trusted Wallpapers"), action: #selector(resetTrustedWallpapers), keyEquivalent: "")
+            .init(title: String(localized: "Reset First Launch"), action: #selector(AppDelegate.shared.resetFirstLaunch), keyEquivalent: ""),
+            .init(title: String(localized: "Toggle Desktop Wallpaper Window (Debug)"), action: #selector(AppDelegate.shared.toggleDesktopWallpaperWindow), keyEquivalent: ""),
+            .init(title: String(localized: "Reset All Trusted Wallpapers"), action: #selector(AppDelegate.shared.resetTrustedWallpapers), keyEquivalent: "")
         ]
         
         // Help Menu
@@ -118,9 +116,11 @@ extension AppDelegate {
             helpMenu
         ]
         
-        NSApplication.shared.mainMenu = mainMenu
+        return mainMenu
     }
-    
+}
+
+extension AppDelegate {
     @objc func toggleDesktopWallpaperWindow() {
         if wallpaperWindow.isVisible {
             wallpaperWindow.orderOut(nil)

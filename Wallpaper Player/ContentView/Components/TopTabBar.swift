@@ -105,7 +105,7 @@ struct TopTabBar: SubviewOfContentView {
                     }
                     Divider()
                     Button{
-                        appDelegate.openSettingsWindow()
+                        AppDelegate.shared.openSettingsWindow()
                     } label: {
                         Label("Settings", systemImage: "gearshape.fill")
                             .contentShape(Rectangle())

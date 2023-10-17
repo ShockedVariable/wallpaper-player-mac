@@ -10,7 +10,14 @@ import SwiftUI
 import AVKit
 import WebKit
 
+@main
 class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
+    
+    /// Provides the top-level entry point for the app.
+    static func main() {
+        NSApplication.shared.delegate = AppDelegate.shared
+        NSApplication.shared.run()
+    }
     
     var statusItem: NSStatusItem!
     var settingsWindow: NSWindow!
@@ -32,10 +39,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
 // MARK: - delegate methods
     func applicationDidFinishLaunching(_ notification: Notification) {
-        loadMainMenu()
+        NSApp.mainMenu = .mainMenu()
         
         saveCurrentWallpaper()
-        appDelegate.setPlacehoderWallpaper(with: wallpaperViewModel.currentWallpaper)
+        AppDelegate.shared.setPlacehoderWallpaper(with: wallpaperViewModel.currentWallpaper)
         
         mainWindowController.showWindow(self)
         
@@ -83,6 +90,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
     
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        return false
+    }
+    
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if sender.windows.contains(where: { $0.className != "WallpaperWindow" }) {
+            mainWindowController.showWindow(self)
+        }
         return false
     }
 
