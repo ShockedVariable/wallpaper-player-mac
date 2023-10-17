@@ -124,11 +124,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         self.wallpaperWindow.level = NSWindow.Level(Int(CGWindowLevelForKey(.desktopWindow)))
         self.wallpaperWindow.collectionBehavior = .stationary
         
-        self.wallpaperWindow.setFrame(NSRect(origin: .zero,
-                                             size: CGSize(width: NSScreen.main!.visibleFrame.size.width,
-                                                          height: NSScreen.main!.visibleFrame.size.height + NSScreen.main!.visibleFrame.origin.y + 1)
-                                            ),
-                                      display: true)
+        self.wallpaperWindow.setFrame(NSScreen.main!.wallpaperFrame, display: true)
         self.wallpaperWindow.isMovable = false
         self.wallpaperWindow.titlebarAppearsTransparent = true
         self.wallpaperWindow.titleVisibility = .hidden
@@ -197,6 +193,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             return osWallpaper
         }
         UserDefaults.standard.set(wallpaper, forKey: "OSWallpaper")
+        print("Desktop image saved! which is located at: \(wallpaper.path())")
     }
     
     func setPlacehoderWallpaper(with wallpaper: WEWallpaper) {
