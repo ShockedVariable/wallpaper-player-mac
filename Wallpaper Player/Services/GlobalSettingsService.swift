@@ -177,9 +177,9 @@ class GlobalSettingsViewModel: ObservableObject {
     }
     
     func didChangeScreenParameters() {
-        AppDelegate.shared.wallpaperWindow.setFrame(NSScreen.main!.wallpaperFrame, display: true)
+//        AppDelegate.shared.wallpaperWindow.setFrame(NSScreen.main!.wallpaperFrame, display: true)
         
-        logger.info("\(NSScreen.screens.map { $0 == NSScreen.main! })")
+        print("\(NSScreen.screens.map { $0 == NSScreen.main! })")
     }
     
     func didAddToLoginItem(_ added: Bool) {
@@ -347,6 +347,6 @@ struct GSDisplayIdentifier: Codable, Equatable {
         self.model = model
         self.serial = serial
         
-        logger.debug("New Display Identifier Initialized! [vendor: \(vendor), model: \(model), serial: \(serial)]")
+        print("New Display Identifier Initialized! [vendor: \(vendor), model: \(model), serial: \(serial)]")
     }
 }

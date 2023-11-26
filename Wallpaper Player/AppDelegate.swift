@@ -6,12 +6,13 @@
 //
 
 import Cocoa
+import Combine
 import SwiftUI
 import AVKit
 import WebKit
 
 @main
-class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     /// Provides the top-level entry point for the app.
     static func main() {
@@ -20,10 +21,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
     
     var statusItem: NSStatusItem!
-    var settingsWindow: NSWindow!
-    
-    let mainWindowController = MainWindowController()
-    let settingsWindowController = SettingsWindowController()
 
     var wallpaperWindow: NSWindow!
     
@@ -37,6 +34,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     static var shared = AppDelegate()
     
+    // Windows
+    weak var mainWindow: NSWindow?
+    weak var settingsWindow: NSWindow?
+    
+    // MARK: Open Settings Window
+    @objc func openSettingsWindow() {
+        settingsWindowController.showWindow(self)
+    }
+    
+    // MARK: Open Main Window
+    @objc func openMainWindow() {
+        mainWindowController.showWindow(self)
+    }
+    
+    lazy var mainWindowController = MainWindowController()
+    lazy var settingsWindowController = SettingsWindowController()
+    
 // MARK: - delegate methods
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.mainMenu = .mainMenu()
@@ -44,7 +58,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         saveCurrentWallpaper()
         AppDelegate.shared.setPlacehoderWallpaper(with: wallpaperViewModel.currentWallpaper)
         
-        mainWindowController.showWindow(self)
+        openMainWindow()
         
 //        setWallpaperWindow()
 //        
@@ -94,23 +108,21 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
     
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        if sender.windows.contains(where: { $0.className != "WallpaperWindow" }) {
-            mainWindowController.showWindow(self)
-        }
+        openMainWindow()
         return false
     }
 
 // MARK: - misc methods
-    @objc func openSettingsWindow() {
-        NSApp.activate(ignoringOtherApps: true)
-        self.settingsWindow.center()
-        self.settingsWindow.makeKeyAndOrderFront(nil)
-    }
+//    @objc func openSettingsWindow() {
+//        NSApp.activate(ignoringOtherApps: true)
+//        self.settingsWindow?.center()
+//        self.settingsWindow?.makeKeyAndOrderFront(nil)
+//    }
     
-    @objc func openMainWindow() {
-        self.mainWindowController.window?.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
-    }
+//    @objc func openMainWindow() {
+//        self.mainWindowController.window?.makeKeyAndOrderFront(nil)
+//        NSApp.activate(ignoringOtherApps: true)
+//    }
     
     @MainActor @objc func toggleFilter() {
         self.contentViewModel.isFilterReveal.toggle()

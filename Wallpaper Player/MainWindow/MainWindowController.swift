@@ -6,33 +6,35 @@
 //
 
 import Cocoa
+import Combine
 import SwiftUI
 
-class MainWindowController: NSWindowController, NSWindowDelegate, NSToolbarDelegate {
+final class MainWindowController: NSWindowController, NSWindowDelegate, NSToolbarDelegate, ObservableObject {
     
     weak var multiDisplayToolbarItem: NSToolbarItem?
     weak var playbackToolbarItem: NSToolbarItem?
     
-    init() {
+    private var cancellables = Set<AnyCancellable>()
+    
+    @Published var isPlaying = false
+    
+    convenience init() {
+        self.init(windowNibName: "")
+    }
+    
+    override func loadWindow() {
         let window = NSWindow(contentRect: .zero,
-                              styleMask: [],
+                              styleMask: [
+                                .titled,
+                                .resizable,
+                                .closable,
+                                .miniaturizable,
+                                .fullSizeContentView,
+                                .unifiedTitleAndToolbar],
                               backing: .buffered,
-                              defer: false,
-                              screen: .main)
-        super.init(window: window)
+                              defer: false)
         
-        window.windowController = self
         window.delegate = self
-        window.styleMask = [
-            .titled,
-            .resizable,
-            .closable,
-            .miniaturizable,
-            .fullSizeContentView,
-            .unifiedTitleAndToolbar,
-        ]
-        
-        window.hasShadow = true
 
         // Title
         window.titleVisibility = .hidden
@@ -42,23 +44,12 @@ class MainWindowController: NSWindowController, NSWindowDelegate, NSToolbarDeleg
 
         let toolbar = NSToolbar(identifier: "main-toolbar")
         toolbar.delegate = self
-        toolbar.allowsUserCustomization = false
         toolbar.displayMode = .iconOnly
         window.toolbar = toolbar
         
-        // View Controller
-        window.contentViewController = SplitViewController()
+        window.setFrameAutosaveName("MainWindow")
         
-        // Frame
-        window.minSize = NSSize(width: 980, height: 580)
-        
-        window.setFrameUsingName("MainWindow")
-        
-        windowDidLoad()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        self.window = window
     }
     
     func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
@@ -75,7 +66,7 @@ class MainWindowController: NSWindowController, NSWindowDelegate, NSToolbarDeleg
     }
     
     func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        [.toggleSidebar, .sidebarTrackingSeparator, .multiDisplayPicker, .flexibleSpace, .togglePreview]
+        [.toggleSidebar, .sidebarTrackingSeparator, .multiDisplayPicker, .playbackButton, .flexibleSpace, .togglePreview]
     }
     
     func toolbarSelectableItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
@@ -88,16 +79,23 @@ class MainWindowController: NSWindowController, NSWindowDelegate, NSToolbarDeleg
         switch itemIdentifier {
         case .multiDisplayPicker:
             let picker = NSPopUpButton()
-            picker.addItem(withTitle: "Built-in Liquid Retina XDR Display")
-            picker.addItem(withTitle: "X401R")
             
             picker.bezelStyle = .toolbar
             
             toolbarItem.view = picker
+            
+            multiDisplayToolbarItem = toolbarItem
+            
+            updateDisplayPickerData()
         case .togglePreview:
             toolbarItem.image = NSImage(systemSymbolName: "sidebar.trailing", accessibilityDescription: nil)
             toolbarItem.isBordered = true
             toolbarItem.action = #selector(togglePreview)
+        case .playbackButton:
+            toolbarItem.image = NSImage(systemSymbolName: "play.fill", accessibilityDescription: nil)
+            toolbarItem.isBordered = true
+            toolbarItem.action = #selector(togglePlayback)
+            playbackToolbarItem = toolbarItem
         default:
             break
         }
@@ -106,7 +104,34 @@ class MainWindowController: NSWindowController, NSWindowDelegate, NSToolbarDeleg
     }
     
     override func windowDidLoad() {
-        print("Hello")
+        super.windowDidLoad()
+        
+        NotificationCenter.default.publisher(for: NSApplication.didChangeScreenParametersNotification)
+            .sink { [weak self] _ in self?.updateDisplayPickerData() }
+            .store(in: &cancellables)
+        
+        $isPlaying
+            .sink { [weak self] isPlaying in
+                if isPlaying {
+                    self?.playbackToolbarItem?.image = NSImage(systemSymbolName: "pause.fill", accessibilityDescription: nil)
+                } else {
+                    self?.playbackToolbarItem?.image = NSImage(systemSymbolName: "play.fill", accessibilityDescription: nil)
+                }
+            }
+            .store(in: &cancellables)
+        
+        // View Controller
+        window?.contentViewController = SplitViewController()
+    }
+    
+    func updateDisplayPickerData() {
+        guard let picker = multiDisplayToolbarItem?.view as? NSPopUpButton else { return }
+        picker.removeAllItems()
+        
+        
+        NSScreen.screens.forEach { screen in
+            picker.addItem(withTitle: screen.localizedName)
+        }
     }
     
     func windowWillClose(_ notification: Notification) {
@@ -125,16 +150,16 @@ class MainWindowController: NSWindowController, NSWindowDelegate, NSToolbarDeleg
         
     }
     
-    func windowDidResize(_ notification: Notification) {
-        window?.saveFrame(usingName: "MainWindow")
-    }
-    
     @objc func togglePreview() {
         (contentViewController as? SplitViewController)?
             .inspectorItem
             .animator()
             .isCollapsed
             .toggle()
+    }
+    
+    @objc func togglePlayback() {
+        isPlaying.toggle()
     }
 }
 

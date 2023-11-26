@@ -82,14 +82,14 @@ struct PluginsPage: SettingsPage {
     }
 }
 
-struct PluginPage_Previews: PreviewProvider {
-    static var previews: some View {
-        SettingsView()
-            .environmentObject({ () -> GlobalSettingsViewModel in
-                let viewModel = GlobalSettingsViewModel()
-                viewModel.selection = 2
-                return viewModel
-            }())
-            .frame(width: 500, height: 600)
-    }
-}
+//struct PluginPage_Previews: PreviewProvider {
+//    static var previews: some View {
+//        SettingsView()
+//            .environmentObject({ () -> GlobalSettingsViewModel in
+//                let viewModel = GlobalSettingsViewModel()
+//                viewModel.selection = 2
+//                return viewModel
+//            }())
+//            .frame(width: 500, height: 600)
+//    }
+//}

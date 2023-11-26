@@ -51,6 +51,7 @@
 		5EC47E9D2A2DB2E700120CCC /* Open_Wallpaper_EngineUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC47E9C2A2DB2E700120CCC /* Open_Wallpaper_EngineUITestsLaunchTests.swift */; };
 		5EC47EAA2A2DB32900120CCC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC47EA92A2DB32900120CCC /* ContentView.swift */; };
 		5EC47EAC2A2DB3E500120CCC /* WallpaperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC47EAB2A2DB3E500120CCC /* WallpaperView.swift */; };
+		5ED341A72AF406AB00ADA7D4 /* WallpaperKit in Frameworks */ = {isa = PBXBuildFile; productRef = 5ED341A62AF406AB00ADA7D4 /* WallpaperKit */; };
 		5ED44B722ACF1266003E5A2F /* mian.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ED44B712ACF1266003E5A2F /* mian.swift */; };
 		5ED8C50A2AC2F675007BE522 /* WallpaperList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ED8C5092AC2F675007BE522 /* WallpaperList.swift */; };
 		5ED8C50C2AC300F1007BE522 /* GenresList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ED8C50B2AC300F1007BE522 /* GenresList.swift */; };
@@ -163,6 +164,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5ED341A72AF406AB00ADA7D4 /* WallpaperKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -429,6 +431,9 @@
 			dependencies = (
 			);
 			name = "Wallpaper Player";
+			packageProductDependencies = (
+				5ED341A62AF406AB00ADA7D4 /* WallpaperKit */,
+			);
 			productName = "Open Wallpaper Engine";
 			productReference = 5EC47E762A2DB2E600120CCC /* Wallpaper Player.app */;
 			productType = "com.apple.product-type.application";
@@ -502,6 +507,9 @@
 				"zh-Hans",
 			);
 			mainGroup = 5EC47E6D2A2DB2E600120CCC;
+			packageReferences = (
+				5ED341A52AF406AB00ADA7D4 /* XCRemoteSwiftPackageReference "WallpaperKit" */,
+			);
 			productRefGroup = 5EC47E772A2DB2E600120CCC /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -943,6 +951,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		5ED341A52AF406AB00ADA7D4 /* XCRemoteSwiftPackageReference "WallpaperKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/haren724/WallpaperKit";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5ED341A62AF406AB00ADA7D4 /* WallpaperKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5ED341A52AF406AB00ADA7D4 /* XCRemoteSwiftPackageReference "WallpaperKit" */;
+			productName = WallpaperKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 5EC47E6E2A2DB2E600120CCC /* Project object */;
 }

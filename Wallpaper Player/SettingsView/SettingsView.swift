@@ -17,24 +17,22 @@ protocol SettingsPage: View {
 struct SettingsView: View {
     @EnvironmentObject var viewModel: GlobalSettingsViewModel
     
+    @ObservedObject var windowController: SettingsWindowController
+    
     var body: some View {
-        TabView {
-            PerformancePage(globalSettings: viewModel)
-                .tabItem {
-                    Label("Performance", systemImage: "speedometer")
-                }
-            GeneralPage(globalSettings: viewModel)
-                .tabItem {
-                    Label("General", systemImage: "gearshape")
-                }
-            PluginsPage(globalSettings: viewModel)
-                .tabItem {
-                    Label("Plugins", systemImage: "puzzlepiece.extension")
-                }
-            AboutUsView()
-                .tabItem {
-                    Label("About", systemImage: "person.3")
-                }
+        Group {
+            switch windowController.tabSelection {
+            case .none:
+                PerformancePage(globalSettings: viewModel)
+            case .performance:
+                PerformancePage(globalSettings: viewModel)
+            case .general:
+                GeneralPage(globalSettings: viewModel)
+            case .plugins:
+                PluginsPage(globalSettings: viewModel)
+            case .about:
+                AboutUsView()
+            }
         }
         .frame(minWidth: 500, minHeight: 400, maxHeight: 800)
         .overlay(alignment: .bottom) {
@@ -69,16 +67,16 @@ struct SettingsView: View {
     }
 }
 
-struct SettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        SettingsView()
-            .environmentObject({ () -> GlobalSettingsViewModel in 
-                let viewModel = GlobalSettingsViewModel()
-                viewModel.selection = 2
-                return viewModel
-            }())
-            .frame(width: 500, height: 600)
-    }
-}
+//struct SettingsView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        SettingsView()
+//            .environmentObject({ () -> GlobalSettingsViewModel in 
+//                let viewModel = GlobalSettingsViewModel()
+//                viewModel.selection = 2
+//                return viewModel
+//            }())
+//            .frame(width: 500, height: 600)
+//    }
+//}
 
 

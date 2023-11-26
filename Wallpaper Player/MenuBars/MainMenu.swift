@@ -43,7 +43,7 @@ extension NSMenu {
             // 在此处添加子菜单项
             importMenu,
             .separator(),
-            .init(title: String(localized: "Close Window"), action: #selector(AppDelegate.shared.mainWindowController.window?.performClose), keyEquivalent: "w")
+            .init(title: String(localized: "Close Window"), action: #selector(AppDelegate.shared.mainWindow?.performClose(_:)), keyEquivalent: "w")
         ]
         
         // Edit Menu
@@ -72,7 +72,7 @@ extension NSMenu {
             }(),
             .separator(),
             {
-                let item = NSMenuItem(title: String(localized: "Enter Full Screen"), action: #selector(AppDelegate.shared.mainWindowController.window?.toggleFullScreen(_:)), keyEquivalent: "f")
+                let item = NSMenuItem(title: String(localized: "Enter Full Screen"), action: #selector(AppDelegate.shared.mainWindow?.toggleFullScreen(_:)), keyEquivalent: "f")
                 item.keyEquivalentModifierMask = [.command, .control]
                 return item
             }()

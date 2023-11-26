@@ -8,20 +8,134 @@
 import Cocoa
 import SwiftUI
 
-class SettingsWindowController: NSWindowController {
+struct ConfigModel: Codable {
+    
+}
+
+struct PlaybackConfig: Codable {
+    
+}
+
+class WindowController: NSObject {
+    
+}
+
+class SettingsWindowController: NSWindowController, NSToolbarDelegate, NSWindowDelegate, ObservableObject {
+    
+    @Published var tabSelection: SettingsTabSelestion?
     
     convenience init() {
-        self.init(window: NSWindow())
-        let window = self.window!
-        
-        window.toolbarStyle = .preference
-        window.contentView = NSHostingView(rootView: SettingsView(viewModel: .init()).environmentObject(GlobalSettingsViewModel()))
+        self.init(windowNibName: "")
     }
-
+    
+    override func loadWindow() {
+        let window = NSWindow(contentRect: .zero,
+                             styleMask: [.titled,
+                                         .closable,
+                                         .fullSizeContentView],
+                             backing: .buffered,
+                             defer: false)
+        
+        window.delegate = self
+        window.title = "Settings"
+        
+        // Toolbar
+        window.toolbarStyle = .preference
+        let toolbar = NSToolbar(identifier: "settings-toolbar")
+        toolbar.delegate = self
+        toolbar.selectedItemIdentifier = .settingsPerformance
+        window.title = "Performance"
+        
+        window.toolbar = toolbar
+        
+        self.window = window
+    }
+    
     override func windowDidLoad() {
         super.windowDidLoad()
-    
-        // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
+        
+        
+        contentViewController = NSHostingController(rootView: SettingsView(viewModel: .init(), windowController: self).environmentObject(GlobalSettingsViewModel()))
     }
+    
+    override func showWindow(_ sender: Any?) {
+        if let window = window, window.isVisible {
+            super.showWindow(sender)
+        } else {
+            window?.center()
+            super.showWindow(sender)
+        }
+    }
+    
+    deinit {
+        print("Deallocating \(className)...")
+    }
+}
 
+// Extension for NSToolbar Delegate Methods
+extension SettingsWindowController {
+    
+    @objc func switchTabSelection(_ sender: NSToolbarItem) {
+        tabSelection = SettingsTabSelestion(rawValue: sender.tag)
+        window?.title = sender.label
+    }
+    
+    func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
+        let toolbarItem = NSToolbarItem(itemIdentifier: itemIdentifier)
+        
+        switch itemIdentifier {
+            
+        case .settingsPerformance:
+            toolbarItem.label = "Performance"
+            toolbarItem.image = NSImage(systemSymbolName: "gauge.open.with.lines.needle.33percent", accessibilityDescription: nil)
+            toolbarItem.tag = SettingsTabSelestion.performance.rawValue
+            toolbarItem.action = #selector(switchTabSelection(_:))
+            
+        case .settingsGeneral:
+            toolbarItem.label = "General"
+            toolbarItem.image = NSImage(systemSymbolName: "gearshape", accessibilityDescription: nil)
+            toolbarItem.tag = SettingsTabSelestion.general.rawValue
+            toolbarItem.action = #selector(switchTabSelection(_:))
+            
+        case .settingsPlugins:
+            toolbarItem.label = "Plugins"
+            toolbarItem.image = NSImage(systemSymbolName: "puzzlepiece.extension", accessibilityDescription: nil)
+            toolbarItem.tag = SettingsTabSelestion.plugins.rawValue
+            toolbarItem.action = #selector(switchTabSelection(_:))
+            
+        case .settingsAbout:
+            toolbarItem.label = "About"
+            toolbarItem.image = NSImage(systemSymbolName: "person.3", accessibilityDescription: nil)
+            toolbarItem.tag = SettingsTabSelestion.about.rawValue
+            toolbarItem.action = #selector(switchTabSelection(_:))
+            
+        default:
+            fatalError("Invalid Settings Toolbar Item!")
+        }
+        
+        return toolbarItem
+    }
+    
+    func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+        [.settingsAbout, .settingsGeneral, .settingsPlugins, .settingsPerformance]
+    }
+    
+    func toolbarSelectableItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+        [.settingsAbout, .settingsGeneral, .settingsPlugins, .settingsPerformance]
+    }
+    
+    func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+        [.settingsPerformance, .settingsGeneral, .settingsPlugins, .settingsAbout]
+    }
+}
+
+extension NSToolbarItem.Identifier {
+    static let settingsPerformance = Self.init("settings-performance")
+    static let settingsGeneral = Self.init("settings-general")
+    static let settingsPlugins = Self.init("settings-plugins")
+    static let settingsAbout = Self.init("settings-about")
+}
+
+enum SettingsTabSelestion: Int {
+    case performance, general, plugins, about
 }
