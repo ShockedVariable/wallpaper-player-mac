@@ -49,6 +49,8 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSToolba
         
         window.setFrameAutosaveName("MainWindow")
         
+        window.tabbingMode = .disallowed
+        
         self.window = window
     }
     
@@ -103,11 +105,16 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSToolba
         return toolbarItem
     }
     
+    // MARK: windowDidLoad
     override func windowDidLoad() {
         super.windowDidLoad()
         
         NotificationCenter.default.publisher(for: NSApplication.didChangeScreenParametersNotification)
             .sink { [weak self] _ in self?.updateDisplayPickerData() }
+            .store(in: &cancellables)
+        
+        NotificationCenter.default.publisher(for: AppController.didReopenNotification)
+            .sink { [weak self] _ in self?.showWindow(self) }
             .store(in: &cancellables)
         
         $isPlaying
@@ -162,11 +169,6 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSToolba
         isPlaying.toggle()
     }
 }
-
-//class SideBarNavigation: ObservableObject {
-//    @Published var navigation:
-//    
-//}
 
 // All Customized Toolbar Items
 extension NSToolbarItem.Identifier {

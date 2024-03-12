@@ -11,7 +11,48 @@ import SwiftUI
 import AVKit
 import WebKit
 
-@main
+import UserNotifications
+
+final class AppController: NSObject, NSApplicationDelegate {
+    
+    private var cancellable = Set<AnyCancellable>()
+    
+    lazy var mainWindowController = MainWindowController()
+    
+    lazy var settingsWindowController = SettingsWindowController()
+    
+    lazy var wallpaperWindowController = WallpaperWindowController()
+    
+    private override init() { 
+        super.init()
+        
+        NotificationCenter.default.publisher(for: NSApplication.didFinishLaunchingNotification)
+            .sink { [weak self] _ in
+                self?.wallpaperWindowController.showWindow(self)
+                self?.mainWindowController.showWindow(self)
+            }
+            .store(in: &cancellable)
+        
+        NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)
+            .sink { [weak self] _ in
+                if NSApp.keyWindow == nil {
+                    self?.mainWindowController.showWindow(self)
+                }
+            }
+            .store(in: &cancellable)
+    }
+    
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        NotificationCenter.default.post(name: Self.didReopenNotification, object: self)
+        return true
+    }
+    
+    static let didReopenNotification = NSNotification.Name("com.haren724.applicationdidreopen")
+    
+    static let shared = AppController()
+}
+
+
 final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     /// Provides the top-level entry point for the app.
@@ -50,37 +91,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     lazy var mainWindowController = MainWindowController()
     lazy var settingsWindowController = SettingsWindowController()
+    lazy var wallpaperWindowController = WallpaperWindowController()
+    
     
 // MARK: - delegate methods
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.mainMenu = .mainMenu()
         
-        saveCurrentWallpaper()
-        AppDelegate.shared.setPlacehoderWallpaper(with: wallpaperViewModel.currentWallpaper)
+//        saveCurrentWallpaper()
+//        AppDelegate.shared.setPlacehoderWallpaper(with: wallpaperViewModel.currentWallpaper)
         
-        openMainWindow()
+//        openMainWindow()
+        wallpaperWindowController.showWindow(self)
         
-//        setWallpaperWindow()
-//        
-//        wallpaperWindow.orderFront(nil)
-//        
-//        for window in NSApp.windows {
-//            if window.title == "Wallpaper" {
-//                window.styleMask = [.borderless, .fullSizeContentView]
-//                window.level = NSWindow.Level(Int(CGWindowLevelForKey(.desktopWindow)))
-//                
-//                window.setFrame(NSRect(origin: .zero,
-//                                                     size: CGSize(width: NSScreen.main!.visibleFrame.size.width,
-//                                                                  height: NSScreen.main!.visibleFrame.size.height + NSScreen.main!.visibleFrame.origin.y + 1)
-//                                                    ),
-//                                              display: true)
-//                window.isMovable = false
-//                window.titlebarAppearsTransparent = true
-//                window.titleVisibility = .hidden
-//                window.canHide = false
-//                window.collectionBehavior = .stationary
-//            }
-//        }
+        
     }
     
     func applicationWillTerminate(_ notification: Notification) {
@@ -145,7 +169,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         self.wallpaperWindow.isReleasedWhenClosed = false
         
         self.wallpaperWindow.contentView = NSHostingView(rootView:
-            WallpaperView(viewModel: self.wallpaperViewModel)
+            WallpaperViewa(viewModel: self.wallpaperViewModel)
         )
     }
     

@@ -8,6 +8,18 @@
 import Cocoa
 import SwiftUI
 
+///
+/// The overall layout of this view should look like this:
+///  ——————————————
+/// |           |   Window Title   |            |
+///  ——————————————
+/// |           |                           |            |
+/// |  Side  |                           |  Insp   |
+/// |   bar   |       Content       |   ect    |
+/// |           |         View          |    or     |
+/// |           |                           |            |
+///  ——————————————
+///
 class SplitViewController: NSSplitViewController {
     
     var sideBarItem:   NSSplitViewItem!
@@ -17,17 +29,21 @@ class SplitViewController: NSSplitViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Initialize & include all child view controllers
+        // Side Bar View
         sideBarItem = NSSplitViewItem(
             sidebarWithViewController: SideBarViewController()
         )
         addSplitViewItem(sideBarItem)
+        
+        // Content View
         contentItem = NSSplitViewItem(
             viewController: ContentViewController()
         )
         addSplitViewItem(contentItem)
+        
+        // Inspector View
         inspectorItem = NSSplitViewItem(
-            inspectorWithViewController: NSHostingController(rootView: Text("Hello").frame(maxWidth: .infinity, maxHeight: .infinity))
+            inspectorWithViewController: InspectorViewController()
         )
         addSplitViewItem(inspectorItem)
         
@@ -38,9 +54,25 @@ class SplitViewController: NSSplitViewController {
         sideBarItem.minimumThickness = 200
         sideBarItem.maximumThickness = 400
         
-//        inspectorItem.minimumThickness = 356
+        //        inspectorItem.minimumThickness = 356
         
         splitView.autosaveName = "ContentSplitView"
         
+        self.inspectorItem.isCollapsed = false /// - Warning: Debug purpose, should be deleted when releasing
     }
+}
+
+struct SplitView_Preview: NSViewControllerRepresentable {
+    func makeNSViewController(context: Context) -> some NSViewController {
+        SplitViewController()
+    }  
+    
+    func updateNSViewController(_ nsViewController: NSViewControllerType, context: Context) {
+        
+    }
+}
+
+#Preview {
+    SplitView_Preview()
+        .frame(width: 1067, height: 600)
 }

@@ -8,7 +8,7 @@
 import Cocoa
 import SwiftUI
 
-struct WallpaperView: View {
+struct WallpaperViewa: View {
     @ObservedObject var viewModel: WallpaperViewModel
     
     var body: some View {

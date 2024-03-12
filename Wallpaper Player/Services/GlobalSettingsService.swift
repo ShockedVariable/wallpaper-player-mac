@@ -327,7 +327,7 @@ extension NSScreen {
     }
 }
 
-struct GSDisplayIdentifier: Codable, Equatable {
+struct GSDisplayIdentifier: Codable, Equatable, Hashable {
     var vendor: UInt32
     var model: UInt32
     var serial: UInt32

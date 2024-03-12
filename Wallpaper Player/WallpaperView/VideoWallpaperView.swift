@@ -9,6 +9,27 @@ import Cocoa
 import SwiftUI
 import AVKit
 
+import WallpaperKit
+
+struct VideoWallpaperViewWrapper: View {
+    
+    @ObservedObject var wallpaper: VideoWallpaper
+    
+    private var vm: WallpaperViewModel {
+        let vm = WallpaperViewModel()
+        
+        let wp = WEWallpaper(using: WEProject(file: wallpaper.file, preview: "preview.gif", title: wallpaper.title, type: "video"), where: wallpaper.bundleURL)
+        
+        vm.currentWallpaper = wp
+        
+        return vm
+    }
+
+    var body: some View {
+        VideoWallpaperView(wallpaperViewModel: vm)
+    }
+}
+
 struct VideoWallpaperView: NSViewRepresentable {
     @ObservedObject var wallpaperViewModel: WallpaperViewModel
     @StateObject var viewModel: VideoWallpaperViewModel

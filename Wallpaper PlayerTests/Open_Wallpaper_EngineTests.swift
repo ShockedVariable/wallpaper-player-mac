@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import Open_Wallpaper_Engine
+@testable import Wallpaper_Player
 
 final class Open_Wallpaper_EngineTests: XCTestCase {
 

@@ -7,6 +7,7 @@
 
 // MARK: - # Deprecated
 
+import Combine
 import Cocoa
 import SwiftUI
 
@@ -206,4 +207,32 @@ extension AppDelegate {
         }
     }
     */
+}
+
+final class StatusBarController {
+    
+    private var cancellable = Set<AnyCancellable>()
+    
+    var statusItem: NSStatusItem!
+    
+    private init() {
+        NotificationCenter.default.publisher(for: NSApplication.didFinishLaunchingNotification)
+            .sink { [weak self] _ in self?.initStatusBar() }
+            .store(in: &cancellable)
+    }
+    
+    private func initStatusBar() {
+        self.statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        
+        if let button = self.statusItem.button {
+            if let image = NSImage(named: "we.logo") {
+                image.isTemplate = true
+                button.image = image
+            } else {
+                button.image = NSImage(systemSymbolName: "play.desktopcomputer", accessibilityDescription: nil)
+            }
+        }
+    }
+    
+    static let shared = StatusBarController()
 }

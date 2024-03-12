@@ -66,10 +66,6 @@ class SettingsWindowController: NSWindowController, NSToolbarDelegate, NSWindowD
             super.showWindow(sender)
         }
     }
-    
-    deinit {
-        print("Deallocating \(className)...")
-    }
 }
 
 // Extension for NSToolbar Delegate Methods

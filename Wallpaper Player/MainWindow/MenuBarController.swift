@@ -1,0 +1,145 @@
+//
+//  MenuBarController.swift
+//  Wallpaper Player
+//
+//  Created by Haren on 2023/12/14.
+//
+
+import Combine
+import Cocoa
+
+final class MenuBarController {
+    
+    private var cancellable = Set<AnyCancellable>()
+    
+    static let didFinishLoadingPublisher = PassthroughSubject<Void, Error>()
+    
+    private init() {
+        NotificationCenter.default.publisher(for: NSApplication.didFinishLaunchingNotification)
+            .sink { [weak self] _ in self?.initMenuBar() }
+            .store(in: &cancellable)
+    }
+    
+    private func initMenuBar() {
+        // 主菜单
+        let appMenu = NSMenuItem()
+        appMenu.submenu = NSMenu(title: "Wallpaper Player")
+        appMenu.submenu?.items = [
+            // 在此处添加子菜单项
+            .init(title: String(localized: "About Wallpaper Player"), action: #selector(AppDelegate.shared.showAboutUs), keyEquivalent: ""),
+            .separator(),
+            .init(title: String(localized: "Settings..."), action: #selector(AppDelegate.shared.openSettingsWindow), keyEquivalent: ","),
+            .separator(),
+            .init(title: String(localized: "Quit"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"),
+            .separator(),
+            .init(title: String(localized: "Hide"), action: #selector(NSApplication.hide(_:)), keyEquivalent: "h"),
+            {
+                let item = NSMenuItem(title: String(localized: "Hide Others"), action: #selector(NSApplication.hideOtherApplications(_:)), keyEquivalent: "h")
+                item.keyEquivalentModifierMask = [.command, .option]
+                return item
+            }()
+        ]
+        
+        // 导入子菜单
+        let importMenu = NSMenuItem(title: String(localized: "Import"), action: nil, keyEquivalent: "")
+        importMenu.submenu = NSMenu()
+        importMenu.submenu?.items = [
+//            .init(title: String(localized: "Wallpaper from Folder"), action: #selector(AppDelegate.sharedopenImportFromFolderPanel), keyEquivalent: "i"),
+            .init(title: String(localized: "Wallpapers in Folders"), action: nil, keyEquivalent: "")
+        ]
+        
+        // 文件菜单
+        let fileMenu = NSMenuItem()
+        fileMenu.submenu = NSMenu(title: String(localized: "File"))
+        fileMenu.submenu?.items = [
+            // 在此处添加子菜单项
+            importMenu,
+            .separator(),
+            .init(title: String(localized: "Close Window"), action: #selector(AppDelegate.shared.mainWindow?.performClose(_:)), keyEquivalent: "w")
+        ]
+        
+        // Edit Menu
+        let editMenu = NSMenuItem()
+        editMenu.submenu = NSMenu(title: String(localized: "Edit"))
+        editMenu.submenu?.items = [
+            .init(title: String(localized: "Undo"), action: #selector(UndoManager.undo), keyEquivalent: "z"),
+            .init(title: String(localized: "Redo"), action: #selector(UndoManager.redo), keyEquivalent: "Z"),
+            .separator(),
+            .init(title: String(localized: "Cut"), action: #selector(NSText.cut(_:)), keyEquivalent: "x"),
+            .init(title: String(localized: "Copy"), action: #selector(NSText.copy(_:)), keyEquivalent: "c"),
+            .init(title: String(localized: "Paste"), action: #selector(NSText.paste(_:)), keyEquivalent: "v"),
+            .init(title: String(localized: "Delete All"), action: #selector(NSText.delete(_:)), keyEquivalent: String(NSBackspaceCharacter)),
+            .separator(),
+            .init(title: String(localized: "Select All"), action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
+        ]
+        
+        // 查看菜单
+        let viewMenu = NSMenuItem()
+        viewMenu.submenu = NSMenu(title: String(localized: "View"))
+        viewMenu.submenu?.items = [
+            {
+                let item = NSMenuItem(title: String(localized: "Show Filter Results"), action: #selector(AppDelegate.shared.toggleFilter), keyEquivalent: "s")
+                item.keyEquivalentModifierMask = [.command, .control]
+                return item
+            }(),
+            .separator(),
+            {
+                let item = NSMenuItem(title: String(localized: "Enter Full Screen"), action: #selector(AppDelegate.shared.mainWindow?.toggleFullScreen(_:)), keyEquivalent: "f")
+                item.keyEquivalentModifierMask = [.command, .control]
+                return item
+            }()
+        ]
+        
+        // 窗口菜单
+        let windowMenu = NSMenuItem()
+        windowMenu.submenu = NSMenu(title: String(localized: "Window"))
+        windowMenu.submenu?.items = [
+            {
+                let item = NSMenuItem(title: String(localized: "Wallpaper Explorer"), action: #selector(AppDelegate.shared.openMainWindow), keyEquivalent: "1")
+                item.keyEquivalentModifierMask = [.command, .shift]
+                return item
+            }()
+        ]
+        
+        // Debug Submenu -> Help Menu
+        let debugMenu = NSMenuItem(title: String(localized: "Debug"), action: nil, keyEquivalent: "")
+        debugMenu.submenu = NSMenu()
+        debugMenu.submenu?.items = [
+            .init(title: String(localized: "Reset First Launch"), action: #selector(AppDelegate.shared.resetFirstLaunch), keyEquivalent: ""),
+            .init(title: String(localized: "Toggle Desktop Wallpaper Window (Debug)"), action: #selector(AppDelegate.shared.toggleDesktopWallpaperWindow), keyEquivalent: ""),
+            .init(title: String(localized: "Reset All Trusted Wallpapers"), action: #selector(AppDelegate.shared.resetTrustedWallpapers), keyEquivalent: "")
+        ]
+        
+        // Help Menu
+        let helpMenu = NSMenuItem()
+        helpMenu.submenu = NSMenu(title: String(localized: "Help"))
+        helpMenu.submenu?.items = [
+            debugMenu
+        ]
+        
+        // Main Menu
+        let mainMenu = NSMenu()
+        mainMenu.items = [
+            appMenu,
+            fileMenu,
+            editMenu,
+            viewMenu,
+            windowMenu,
+            helpMenu
+        ]
+        
+        NSApp.mainMenu = mainMenu
+        
+        Self.didFinishLoadingPublisher.send()
+    }
+    
+    static let shared = MenuBarController()
+}
+
+//extension MenuBarController {
+//    @resultBuilder struct BarBuilder {
+//        static func buildBlock(_ components: NSMenuItem...) -> NSMenu {
+//            <#code#>
+//        }
+//    }
+//}
