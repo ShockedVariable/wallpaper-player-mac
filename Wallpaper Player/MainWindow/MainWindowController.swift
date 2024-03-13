@@ -9,7 +9,7 @@ import Cocoa
 import Combine
 import SwiftUI
 
-final class MainWindowController: NSWindowController, NSWindowDelegate, NSToolbarDelegate, ObservableObject {
+final class MainWindowController: NSWindowController, NSWindowDelegate, ObservableObject {
     
     weak var multiDisplayToolbarItem: NSToolbarItem?
     weak var playbackToolbarItem: NSToolbarItem?
@@ -35,74 +35,23 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSToolba
                               defer: false)
         
         window.delegate = self
-
+        
         // Title
         window.titleVisibility = .hidden
-
+        
         // Toolbar
         window.toolbarStyle = .unified
-
+        
         let toolbar = NSToolbar(identifier: "main-toolbar")
         toolbar.delegate = self
         toolbar.displayMode = .iconOnly
         window.toolbar = toolbar
         
-        window.setFrameAutosaveName("MainWindow")
-        
         window.tabbingMode = .disallowed
         
+        window.minSize = NSSize(width: 1200, height: 750)
+        
         self.window = window
-    }
-    
-    func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        [
-            .toggleSidebar,
-            .multiDisplayPicker, 
-            .playbackButton,
-            .playingInfo,
-            .togglePreview,
-            .space,
-            .flexibleSpace,
-            .sidebarTrackingSeparator
-        ]
-    }
-    
-    func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        [.toggleSidebar, .sidebarTrackingSeparator, .multiDisplayPicker, .playbackButton, .flexibleSpace, .togglePreview]
-    }
-    
-    func toolbarSelectableItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        []
-    }
-    
-    func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
-        let toolbarItem = NSToolbarItem(itemIdentifier: itemIdentifier)
-        
-        switch itemIdentifier {
-        case .multiDisplayPicker:
-            let picker = NSPopUpButton()
-            
-            picker.bezelStyle = .toolbar
-            
-            toolbarItem.view = picker
-            
-            multiDisplayToolbarItem = toolbarItem
-            
-            updateDisplayPickerData()
-        case .togglePreview:
-            toolbarItem.image = NSImage(systemSymbolName: "sidebar.trailing", accessibilityDescription: nil)
-            toolbarItem.isBordered = true
-            toolbarItem.action = #selector(togglePreview)
-        case .playbackButton:
-            toolbarItem.image = NSImage(systemSymbolName: "play.fill", accessibilityDescription: nil)
-            toolbarItem.isBordered = true
-            toolbarItem.action = #selector(togglePlayback)
-            playbackToolbarItem = toolbarItem
-        default:
-            break
-        }
-        
-        return toolbarItem
     }
     
     // MARK: windowDidLoad
@@ -129,6 +78,13 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSToolba
         
         // View Controller
         window?.contentViewController = SplitViewController()
+        
+        windowFrameAutosaveName = "main-window"
+    }
+    
+    
+    func windowDidEndLiveResize(_ notification: Notification) {
+        print(window!.contentLayoutRect.size.debugDescription)
     }
     
     func updateDisplayPickerData() {
@@ -141,22 +97,6 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSToolba
         }
     }
     
-    func windowWillClose(_ notification: Notification) {
-        
-    }
-    
-    func windowDidResignKey(_ notification: Notification) {
-        
-    }
-    
-    func windowDidResignMain(_ notification: Notification) {
-        
-    }
-    
-    func windowDidBecomeKey(_ notification: Notification) {
-        
-    }
-    
     @objc func togglePreview() {
         (contentViewController as? SplitViewController)?
             .inspectorItem
@@ -167,6 +107,60 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, NSToolba
     
     @objc func togglePlayback() {
         isPlaying.toggle()
+    }
+}
+
+// MARK: - Toolbar Delegate Methods
+extension MainWindowController: NSToolbarDelegate {
+    func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+        [
+            .toggleSidebar,
+            .multiDisplayPicker,
+                .playbackButton,
+            .playingInfo,
+            .togglePreview,
+            .space,
+            .flexibleSpace,
+            .sidebarTrackingSeparator
+        ]
+    }
+    
+    func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+        [.toggleSidebar, .sidebarTrackingSeparator, .multiDisplayPicker, .playbackButton, .flexibleSpace, .togglePreview]
+    }
+    
+    func toolbarSelectableItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+        []
+    }
+    
+    func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
+        let toolbarItem = NSToolbarItem(itemIdentifier: itemIdentifier)
+        
+        switch itemIdentifier {
+            case .multiDisplayPicker:
+                let picker = NSPopUpButton()
+                
+                picker.bezelStyle = .toolbar
+                
+                toolbarItem.view = picker
+                
+                multiDisplayToolbarItem = toolbarItem
+                
+                updateDisplayPickerData()
+            case .togglePreview:
+                toolbarItem.image = NSImage(systemSymbolName: "sidebar.trailing", accessibilityDescription: nil)
+                toolbarItem.isBordered = true
+                toolbarItem.action = #selector(togglePreview)
+            case .playbackButton:
+                toolbarItem.image = NSImage(systemSymbolName: "play.fill", accessibilityDescription: nil)
+                toolbarItem.isBordered = true
+                toolbarItem.action = #selector(togglePlayback)
+                playbackToolbarItem = toolbarItem
+            default:
+                break
+        }
+        
+        return toolbarItem
     }
 }
 

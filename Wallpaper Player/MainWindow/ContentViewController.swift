@@ -21,7 +21,7 @@ class ContentViewController: NSHostingController<ContentViewController.ContentVi
     struct ContentView: View {
         var body: some View {
             WallpaperExplorer(contentViewModel: .init(), wallpaperViewModel: .init())
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(minWidth: 400, maxWidth: .infinity, minHeight: 300, maxHeight: .infinity)
         }
     }
 }

@@ -7,6 +7,30 @@
 
 import SwiftUI
 
+protocol ExplorerStyle {
+    
+}
+
+extension ExplorerStyle {
+    static var automatic: DefaultExplorerStyle { .init() }
+    
+    static var labaledAlbum: LabeledAlbumExplorerStyle { .init() }
+    
+    static var unlabeledAlbum: UnlabeledAlbumExplorerStyle { .init() }
+}
+
+struct DefaultExplorerStyle: ExplorerStyle {
+    
+}
+
+struct LabeledAlbumExplorerStyle: ExplorerStyle {
+    
+}
+
+struct UnlabeledAlbumExplorerStyle: ExplorerStyle {
+    
+}
+
 struct ExplorerItem: SubviewOfContentView {
     
     @ObservedObject var viewModel: ContentViewModel
@@ -27,6 +51,7 @@ struct ExplorerItem: SubviewOfContentView {
                 return Bundle.main.url(forResource: "WallpaperNotFound", withExtension: "mp4")!
             }(wallpaper.wallpaperDirectory), animates: animates)
             .resizable()
+            .aspectRatio(contentMode: .fit)
             .clipped()
             .clipShape(RoundedRectangle(cornerRadius: 6.0))
             .selected(wallpaper.wallpaperDirectory == wallpaperViewModel.currentWallpaper.wallpaperDirectory)
@@ -37,7 +62,7 @@ struct ExplorerItem: SubviewOfContentView {
                     .font(.callout)
                     .multilineTextAlignment(.leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                Text("< Placeholder >")
+                Text("haren724")
                     .lineLimit(1)
                     .font(.caption)
                     .foregroundStyle(Color.secondary)

@@ -79,5 +79,5 @@ extension View {
 #Preview {
     WallpaperExplorer(contentViewModel: .init(),
                       wallpaperViewModel: .init())
-    .frame(width: 500, height: 600)
+    .frame(width: 767, height: 600)
 }

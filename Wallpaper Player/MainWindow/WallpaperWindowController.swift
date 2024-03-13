@@ -48,7 +48,7 @@ final class WallpaperWindowController: NSWindowController {
     override func windowDidLoad() {
         super.windowDidLoad()
         
-        if let wallpaper = try? VideoWallpaper(contentsOf: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appending(path: "3012918464")) {
+        if let wallpaper = try? VideoWallpaper(contentsOf: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appending(path: "Chainsaw Man")) {
             contentViewController = NSHostingController(rootView: VideoWallpaperViewWrapper(wallpaper: wallpaper))
         }
         
