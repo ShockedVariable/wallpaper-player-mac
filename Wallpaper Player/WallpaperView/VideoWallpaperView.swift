@@ -15,19 +15,40 @@ struct VideoWallpaperViewWrapper: View {
     
     @ObservedObject var wallpaper: VideoWallpaper
     
-    private var vm: WallpaperViewModel {
-        let vm = WallpaperViewModel()
-        
-        let wp = WEWallpaper(using: WEProject(file: wallpaper.file, preview: "preview.gif", title: wallpaper.title, type: "video"), where: wallpaper.bundleURL)
-        
-        vm.currentWallpaper = wp
-        
-        return vm
+    @StateObject private var vm = WallpaperViewModel()
+    
+    @Binding private var status: PlaybackStatus
+    
+    init(wallpaper: VideoWallpaper, status: Binding<PlaybackStatus>) {
+        self.wallpaper = wallpaper
+        self._status = status
     }
 
     var body: some View {
         VideoWallpaperView(wallpaperViewModel: vm)
+            .onChange(of: status) { newStatus in
+                switch newStatus {
+                    case .playing:
+                        vm.playRate = vm.lastPlayRate
+                    case .paused:
+                        vm.lastPlayRate = vm.playRate
+                        vm.playRate = 0
+                    case .unknown:
+                        break
+                }
+            }
+            .onChange(of: vm.playRate) { rate in
+                if rate == 0 {
+                    status = .paused
+                } else {
+                    status = .playing
+                }
+            }
     }
+}
+
+enum PlaybackStatus: String, Codable {
+    case playing, paused, unknown
 }
 
 struct VideoWallpaperView: NSViewRepresentable {

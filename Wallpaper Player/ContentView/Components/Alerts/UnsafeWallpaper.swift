@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/*
 struct UnsafeWallpaper: View {
     @Environment(\.dismiss) var dismiss
     
@@ -96,3 +97,4 @@ struct UnsafeWallpaper: View {
         }
     }
 }
+*/

@@ -4,7 +4,7 @@
 //
 //  Created by Haren on 2023/8/8.
 //
-
+import os
 import Cocoa
 import Combine
 import SwiftUI
@@ -14,45 +14,17 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, Observab
     weak var multiDisplayToolbarItem: NSToolbarItem?
     weak var playbackToolbarItem: NSToolbarItem?
     
+    weak var mainWindowSearchField: NSSearchField?
+    
+    weak var wallpaperWindowController: WallpaperWindowController?
+    
     private var cancellables = Set<AnyCancellable>()
     
-    @Published var isPlaying = false
+    private let logger = Logger(subsystem: "com.haren724.wallpaper-player", category: className())
     
-    convenience init() {
-        self.init(windowNibName: "")
-    }
+    @Published var playbackStatus = PlaybackStatus.unknown
     
-    override func loadWindow() {
-        let window = NSWindow(contentRect: .zero,
-                              styleMask: [
-                                .titled,
-                                .resizable,
-                                .closable,
-                                .miniaturizable,
-                                .fullSizeContentView,
-                                .unifiedTitleAndToolbar],
-                              backing: .buffered,
-                              defer: false)
-        
-        window.delegate = self
-        
-        // Title
-        window.titleVisibility = .hidden
-        
-        // Toolbar
-        window.toolbarStyle = .unified
-        
-        let toolbar = NSToolbar(identifier: "main-toolbar")
-        toolbar.delegate = self
-        toolbar.displayMode = .iconOnly
-        window.toolbar = toolbar
-        
-        window.tabbingMode = .disallowed
-        
-        window.minSize = NSSize(width: 1200, height: 750)
-        
-        self.window = window
-    }
+    convenience init() { self.init(windowNibName: "") }
     
     // MARK: windowDidLoad
     override func windowDidLoad() {
@@ -62,16 +34,15 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, Observab
             .sink { [weak self] _ in self?.updateDisplayPickerData() }
             .store(in: &cancellables)
         
-        NotificationCenter.default.publisher(for: AppController.didReopenNotification)
-            .sink { [weak self] _ in self?.showWindow(self) }
-            .store(in: &cancellables)
-        
-        $isPlaying
-            .sink { [weak self] isPlaying in
-                if isPlaying {
-                    self?.playbackToolbarItem?.image = NSImage(systemSymbolName: "pause.fill", accessibilityDescription: nil)
-                } else {
-                    self?.playbackToolbarItem?.image = NSImage(systemSymbolName: "play.fill", accessibilityDescription: nil)
+        $playbackStatus
+            .sink { [weak self] status in
+                switch status {
+                    case .playing:
+                        self?.playbackToolbarItem?.image = NSImage(systemSymbolName: "pause.fill", accessibilityDescription: nil)
+                    case .paused:
+                        self?.playbackToolbarItem?.image = NSImage(systemSymbolName: "play.fill", accessibilityDescription: nil)
+                    case .unknown:
+                        self?.playbackToolbarItem?.image = NSImage(systemSymbolName: "play.slash.fill", accessibilityDescription: nil)
                 }
             }
             .store(in: &cancellables)
@@ -79,13 +50,34 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, Observab
         // View Controller
         window?.contentViewController = SplitViewController()
         
+        if let searchField = window?.contentView?.viewWithTag(NSLargeSearchField.className().hashValue) as? NSSearchField {
+            mainWindowSearchField = searchField
+        } else {
+            logger.error("SearchField not found! This weak property will be nil.")
+        }
+        
         windowFrameAutosaveName = "main-window"
     }
     
+    @inline(__always) func binding() {
+        
+    }
     
+    @objc func performSearching(_ sender: Any?) {
+        if let searchField = mainWindowSearchField  {
+            window?.makeFirstResponder(searchField)
+        } else {
+            logger.error("SearchField not found! Find action will do nothing.")
+        }
+    }
+    
+    static let didPerformSearchingNotification = NSNotification.Name("com.haren724.did-perform-searching")
+    
+    #if DEBUG
     func windowDidEndLiveResize(_ notification: Notification) {
         print(window!.contentLayoutRect.size.debugDescription)
     }
+    #endif
     
     func updateDisplayPickerData() {
         guard let picker = multiDisplayToolbarItem?.view as? NSPopUpButton else { return }
@@ -106,7 +98,18 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, Observab
     }
     
     @objc func togglePlayback() {
-        isPlaying.toggle()
+        if let wallpaperWindowController = wallpaperWindowController {
+            switch wallpaperWindowController.playbackStatus {
+                case .playing:
+                    wallpaperWindowController.playbackStatus = .paused
+                case .paused:
+                    wallpaperWindowController.playbackStatus = .playing
+                case .unknown:
+                    break
+            }
+        } else {
+            logger.error("Toggle playback status failed! Cannot find wallpaperWindowController binding.")
+        }
     }
 }
 
@@ -152,7 +155,7 @@ extension MainWindowController: NSToolbarDelegate {
                 toolbarItem.isBordered = true
                 toolbarItem.action = #selector(togglePreview)
             case .playbackButton:
-                toolbarItem.image = NSImage(systemSymbolName: "play.fill", accessibilityDescription: nil)
+                toolbarItem.image = NSImage(systemSymbolName: "play.slash.fill", accessibilityDescription: nil)
                 toolbarItem.isBordered = true
                 toolbarItem.action = #selector(togglePlayback)
                 playbackToolbarItem = toolbarItem
@@ -161,6 +164,41 @@ extension MainWindowController: NSToolbarDelegate {
         }
         
         return toolbarItem
+    }
+}
+
+
+extension MainWindowController {
+    override func loadWindow() {
+        let window = NSWindow(contentRect: .zero,
+                              styleMask: [
+                                .titled,
+                                .resizable,
+                                .closable,
+                                .miniaturizable,
+                                .fullSizeContentView,
+                                .unifiedTitleAndToolbar],
+                              backing: .buffered,
+                              defer: false)
+        
+        window.delegate = self
+        
+        // Title
+        window.titleVisibility = .hidden
+        
+        // Toolbar
+        window.toolbarStyle = .unified
+        
+        let toolbar = NSToolbar(identifier: "main-toolbar")
+        toolbar.delegate = self
+        toolbar.displayMode = .iconOnly
+        window.toolbar = toolbar
+        
+        window.tabbingMode = .disallowed
+        
+        window.minSize = NSSize(width: 1200, height: 750)
+        
+        self.window = window
     }
 }
 

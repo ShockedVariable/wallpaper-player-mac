@@ -36,22 +36,33 @@ struct WallpaperExplorer: SubviewOfContentView {
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 50)
             } else {
-                LazyVGrid(columns: [GridItem(
-                        .adaptive(minimum: viewModel.explorerIconSize,
-                                maximum: viewModel.explorerIconSize * 2))],
-                        alignment: .leading, spacing: 30) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: viewModel.explorerIconSize,
+                                                       maximum: viewModel.explorerIconSize * 2))],
+                          alignment: .center, spacing: 20) {
                     ForEach(Array(viewModel.autoRefreshWallpapers.enumerated()), id: \.0) { (index, wallpaper) in
                         ExplorerItem(viewModel: viewModel, wallpaperViewModel: wallpaperViewModel, wallpaper: wallpaper, index: index)
+                            .padding(.horizontal, 8)
                             .contextMenu {
                                 ExplorerItemMenu(contentViewModel: viewModel, wallpaperViewModel: wallpaperViewModel, current: wallpaper)
                                 ExplorerGlobalMenu(contentViewModel: viewModel, wallpaperViewModel: wallpaperViewModel)
                             }
                             .animation(.spring(), value: viewModel.imageScaleIndex)
-//                            .animation(.spring(), value: wallpaperViewModel.currentWallpaper.rawValue)
+                        //                            .animation(.spring(), value: wallpaperViewModel.currentWallpaper.rawValue)
                     }
                 }
-                .padding(.horizontal)
+                          .padding(.horizontal)
+                          .padding(.top, 40)
+                          .padding(.top)
             }
+        }
+        .overlay(alignment: .top) {
+            Text("Wallpapers")
+                .bold()
+                .font(.title2)
+                .padding(.vertical)
+                .frame(height: 40)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .background(Material.regular)
         }
     }
 }

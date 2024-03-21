@@ -72,7 +72,7 @@ struct StatusBar: Scene {
     }
 }
 
-
+/*
 extension AppDelegate {
     @objc func mute() {
         switch self.wallpaperViewModel.currentWallpaper.project.type.lowercased() {
@@ -236,3 +236,4 @@ final class StatusBarController {
     
     static let shared = StatusBarController()
 }
+*/

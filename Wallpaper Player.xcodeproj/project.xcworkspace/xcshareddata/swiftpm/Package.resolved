@@ -1,4 +1,5 @@
 {
+  "originHash" : "69f4f56aa8b11dc918ecba3bb37aa57372a9c7af042b8e2c8e010a991e7af288",
   "pins" : [
     {
       "identity" : "wallpaperkit",
@@ -6,9 +7,9 @@
       "location" : "https://github.com/haren724/WallpaperKit",
       "state" : {
         "branch" : "main",
-        "revision" : "5926920146294a0b4a5134cbfb007cdfad4c3c86"
+        "revision" : "ce997ba7c4f6f61925b2d0125bc7645d8de3dc03"
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

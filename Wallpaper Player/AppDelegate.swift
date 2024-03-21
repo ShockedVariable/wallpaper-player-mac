@@ -13,33 +13,27 @@ import WebKit
 
 import UserNotifications
 
-final class AppController: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate {
     
-    private var cancellable = Set<AnyCancellable>()
+    // Window Controllers
+    let mainWindowController = MainWindowController()
     
-    lazy var mainWindowController = MainWindowController()
+    let settingsWindowController = SettingsWindowController()
     
-    lazy var settingsWindowController = SettingsWindowController()
+    let wallpaperWindowController = WallpaperWindowController()
     
-    lazy var wallpaperWindowController = WallpaperWindowController()
+    // Services
+//    private var globalSettingsController = GlobalSettingsController()
+//    
+//    private var systemWallpaperController = SystemWallpaperController()
     
-    private override init() { 
-        super.init()
-        
-        NotificationCenter.default.publisher(for: NSApplication.didFinishLaunchingNotification)
-            .sink { [weak self] _ in
-                self?.wallpaperWindowController.showWindow(self)
-                self?.mainWindowController.showWindow(self)
-            }
-            .store(in: &cancellable)
-        
-        NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)
-            .sink { [weak self] _ in
-                if NSApp.keyWindow == nil {
-                    self?.mainWindowController.showWindow(self)
-                }
-            }
-            .store(in: &cancellable)
+    // Combine Cancellables
+    var cancellable = Set<AnyCancellable>()
+    
+    func applicationDidBecomeActive(_ notification: Notification) {
+        if NSApp.keyWindow == nil {
+            mainWindowController.showWindow(self)
+        }
     }
     
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
@@ -48,18 +42,41 @@ final class AppController: NSObject, NSApplicationDelegate {
     }
     
     static let didReopenNotification = NSNotification.Name("com.haren724.applicationdidreopen")
-    
-    static let shared = AppController()
+}
+
+// MARK: - applicationDidFinishLaunching
+extension AppDelegate {
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        mainWindowController.wallpaperWindowController = wallpaperWindowController
+        
+        // Main Menu Bar & Status Bar
+        NSApp.windowsMenu = .windowsMenu(delegate: self)
+        NSApp.helpMenu = .helpMenu(delegate: self)
+        NSApp.mainMenu = NSMenu {
+            NSMenuItem(submenu: .appMenu(delegate: self))
+            NSMenuItem(submenu: .fileMenu(delegate: self))
+            NSMenuItem(submenu: .EditMenu(delegate: self))
+            NSMenuItem(submenu: .viewMenu(delegate: self))
+            NSMenuItem(submenu: NSApp.windowsMenu!)
+            NSMenuItem(submenu: NSApp.helpMenu!)
+        }
+        
+        // Showing main window and wallpaper window by default
+        mainWindowController.showWindow(self)
+        wallpaperWindowController.showWindow(self)
+    }
 }
 
 
-final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
+
+/*
+final class _AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     
     /// Provides the top-level entry point for the app.
-    static func main() {
-        NSApplication.shared.delegate = AppDelegate.shared
-        NSApplication.shared.run()
-    }
+//    static func main() {
+//        NSApplication.shared.delegate = AppDelegate.shared
+//        NSApplication.shared.run()
+//    }
     
     var statusItem: NSStatusItem!
 
@@ -92,11 +109,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     lazy var mainWindowController = MainWindowController()
     lazy var settingsWindowController = SettingsWindowController()
     lazy var wallpaperWindowController = WallpaperWindowController()
-    
-    
+
 // MARK: - delegate methods
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSApp.mainMenu = .mainMenu()
+//        NSApp.mainMenu = .mainMenu()
         
 //        saveCurrentWallpaper()
 //        AppDelegate.shared.setPlacehoderWallpaper(with: wallpaperViewModel.currentWallpaper)
@@ -261,3 +277,4 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
     }
 }
+*/

@@ -478,6 +478,7 @@
       }
     },
     "Close Window" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -511,6 +512,7 @@
       }
     },
     "Copy" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -531,6 +533,7 @@
       }
     },
     "Cut" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -551,6 +554,7 @@
       }
     },
     "Debug" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -561,6 +565,7 @@
       }
     },
     "Delete All" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -697,6 +702,7 @@
       }
     },
     "Enter Full Screen" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -728,6 +734,7 @@
       }
     },
     "File" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -830,6 +837,7 @@
       }
     },
     "Help" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -850,6 +858,7 @@
       }
     },
     "Hide Others" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -920,6 +929,7 @@
       }
     },
     "Import" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1365,6 +1375,7 @@
 
     },
     "Paste" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1605,6 +1616,7 @@
 
     },
     "Redo" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1695,6 +1707,7 @@
       }
     },
     "Reset All Trusted Wallpapers" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1725,6 +1738,7 @@
       }
     },
     "Reset First Launch" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1809,6 +1823,7 @@
       }
     },
     "Select All" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1849,6 +1864,7 @@
       }
     },
     "Show Filter Results" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2029,6 +2045,7 @@
       }
     },
     "Toggle Desktop Wallpaper Window (Debug)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2089,6 +2106,7 @@
       }
     },
     "Undo" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2223,6 +2241,7 @@
       }
     },
     "Wallpaper Explorer" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2268,6 +2287,7 @@
 
     },
     "Wallpapers in Folders" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2276,6 +2296,9 @@
           }
         }
       }
+    },
+    "Wallpapers Library" : {
+      "extractionState" : "manual"
     },
     "We brings you a smoother app animation experience. Powered by the lightweight, modern SwiftUI Framework." : {
       "localizations" : {
@@ -2328,6 +2351,7 @@
       }
     },
     "Window" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {

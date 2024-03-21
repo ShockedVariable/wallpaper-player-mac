@@ -188,3 +188,7 @@ enum WEInitError: Error {
     case resources(was: WEResourcesInitError)
     case preview(was: WEPreviewInitError)
 }
+
+final class WallpapersLibrary: NSDocument {
+    
+}

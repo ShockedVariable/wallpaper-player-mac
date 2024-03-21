@@ -31,7 +31,6 @@
 		5E8BE5CF2B29E2FB00B1EB86 /* NotificationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E8BE5CE2B29E2FB00B1EB86 /* NotificationController.swift */; };
 		5E8BE5D12B29E3C800B1EB86 /* SystemWallpaperController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E8BE5D02B29E3C800B1EB86 /* SystemWallpaperController.swift */; };
 		5E8BE5D32B2A0FB300B1EB86 /* GlobalSettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E8BE5D22B2A0FB300B1EB86 /* GlobalSettingsController.swift */; };
-		5E8BE5D52B2ABE5200B1EB86 /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E8BE5D42B2ABE5200B1EB86 /* MenuBarController.swift */; };
 		5E8C82032A9E15D0009E291B /* ExplorerItemMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E8C82022A9E15D0009E291B /* ExplorerItemMenu.swift */; };
 		5E98F6C72A81D8B200C12E34 /* MainWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E98F6C62A81D8B200C12E34 /* MainWindowController.swift */; };
 		5E9D40442A2EC68600AB8A0C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E9D40432A2EC68600AB8A0C /* AppDelegate.swift */; };
@@ -52,7 +51,7 @@
 		5EB4DB882A98055E000A1FEA /* ExplorerItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EB4DB872A980532000A1FEA /* ExplorerItem.swift */; };
 		5EC47E7E2A2DB2E700120CCC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5EC47E7D2A2DB2E700120CCC /* Assets.xcassets */; };
 		5EC47E812A2DB2E700120CCC /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5EC47E802A2DB2E700120CCC /* Preview Assets.xcassets */; };
-		5EC47E912A2DB2E700120CCC /* Open_Wallpaper_EngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC47E902A2DB2E700120CCC /* Open_Wallpaper_EngineTests.swift */; };
+		5EC47E912A2DB2E700120CCC /* Wallpaper_PlayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC47E902A2DB2E700120CCC /* Wallpaper_PlayerTests.swift */; };
 		5EC47E9B2A2DB2E700120CCC /* Open_Wallpaper_EngineUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC47E9A2A2DB2E700120CCC /* Open_Wallpaper_EngineUITests.swift */; };
 		5EC47E9D2A2DB2E700120CCC /* Open_Wallpaper_EngineUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC47E9C2A2DB2E700120CCC /* Open_Wallpaper_EngineUITestsLaunchTests.swift */; };
 		5EC47EAA2A2DB32900120CCC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EC47EA92A2DB32900120CCC /* ContentView.swift */; };
@@ -119,7 +118,6 @@
 		5E8BE5CE2B29E2FB00B1EB86 /* NotificationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationController.swift; sourceTree = "<group>"; };
 		5E8BE5D02B29E3C800B1EB86 /* SystemWallpaperController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemWallpaperController.swift; sourceTree = "<group>"; };
 		5E8BE5D22B2A0FB300B1EB86 /* GlobalSettingsController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalSettingsController.swift; sourceTree = "<group>"; };
-		5E8BE5D42B2ABE5200B1EB86 /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
 		5E8C82022A9E15D0009E291B /* ExplorerItemMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExplorerItemMenu.swift; sourceTree = "<group>"; };
 		5E98F6C62A81D8B200C12E34 /* MainWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainWindowController.swift; sourceTree = "<group>"; };
 		5E9D40432A2EC68600AB8A0C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -142,7 +140,7 @@
 		5EC47E802A2DB2E700120CCC /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		5EC47E872A2DB2E700120CCC /* Wallpaper_Player.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Wallpaper_Player.entitlements; sourceTree = "<group>"; };
 		5EC47E8C2A2DB2E700120CCC /* Wallpaper PlayerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Wallpaper PlayerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		5EC47E902A2DB2E700120CCC /* Open_Wallpaper_EngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Open_Wallpaper_EngineTests.swift; sourceTree = "<group>"; };
+		5EC47E902A2DB2E700120CCC /* Wallpaper_PlayerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wallpaper_PlayerTests.swift; sourceTree = "<group>"; };
 		5EC47E962A2DB2E700120CCC /* Wallpaper PlayerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Wallpaper PlayerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5EC47E9A2A2DB2E700120CCC /* Open_Wallpaper_EngineUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Open_Wallpaper_EngineUITests.swift; sourceTree = "<group>"; };
 		5EC47E9C2A2DB2E700120CCC /* Open_Wallpaper_EngineUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Open_Wallpaper_EngineUITestsLaunchTests.swift; sourceTree = "<group>"; };
@@ -310,7 +308,6 @@
 		5EA5ED902AD83DBB00DD41CA /* MainWindow */ = {
 			isa = PBXGroup;
 			children = (
-				5E8BE5D42B2ABE5200B1EB86 /* MenuBarController.swift */,
 				5E98F6C62A81D8B200C12E34 /* MainWindowController.swift */,
 				5EA5ED912AD83E1B00DD41CA /* SplitViewController.swift */,
 				5EA5ED932AD83E5C00DD41CA /* SidebarViewController.swift */,
@@ -386,7 +383,7 @@
 		5EC47E8F2A2DB2E700120CCC /* Wallpaper PlayerTests */ = {
 			isa = PBXGroup;
 			children = (
-				5EC47E902A2DB2E700120CCC /* Open_Wallpaper_EngineTests.swift */,
+				5EC47E902A2DB2E700120CCC /* Wallpaper_PlayerTests.swift */,
 			);
 			path = "Wallpaper PlayerTests";
 			sourceTree = "<group>";
@@ -612,7 +609,6 @@
 				5EDF1E162A93B4B6006617EA /* WallpaperDiscover.swift in Sources */,
 				5E66A0DD2A8ADF7C00EE79D6 /* ExplorerTopBar.swift in Sources */,
 				5EAF3F742A87110700F85685 /* PluginsPage.swift in Sources */,
-				5E8BE5D52B2ABE5200B1EB86 /* MenuBarController.swift in Sources */,
 				5EDEBA5E2A2E2A7B003470CB /* SettingsView.swift in Sources */,
 				5E66A0DA2A8ADECC00EE79D6 /* TopTabBar.swift in Sources */,
 				5E8BE5D12B29E3C800B1EB86 /* SystemWallpaperController.swift in Sources */,
@@ -630,7 +626,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5EC47E912A2DB2E700120CCC /* Open_Wallpaper_EngineTests.swift in Sources */,
+				5EC47E912A2DB2E700120CCC /* Wallpaper_PlayerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

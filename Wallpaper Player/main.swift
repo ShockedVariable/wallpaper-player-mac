@@ -6,37 +6,16 @@
 //
 
 import Cocoa
-import OSLog
+import os
 
 // OS Logger
-let logger                      =                         Logger()
+extension Logger {
+    static let shared = Logger(subsystem: "com.haren724.wallpaper-player", category: "general")
+}
 
-// Global Settings
-let globalSettingsController    =  GlobalSettingsController.shared
-
-// App Notifications
-let notificationController      =    NotificationController.shared
-
-// Apply/Restore Original Desktop Image
-let systemWallpaperController   = SystemWallpaperController.shared
-
-// Menu Bar
-let menuBarController           =         MenuBarController.shared
-
-// Status Bar
-let statusBarController         =       StatusBarController.shared
-
-// Delegates & Windows & Views
-let appController               =             AppController.shared
-
-//
-// I tried my best to avoid delegation pattern but have no choice.
-//
-// The reason is that some delegate methods don't have their
-// equivalent NotificationCenter notifications to be transformed
-// into Combine publishers.
-//
-NSApplication.shared.delegate = appController
-
-NSApplication.shared.run()
-
+do {
+    let delegate = AppDelegate()
+    NSApplication.shared.delegate = delegate
+    
+    NSApplication.shared.run()
+}

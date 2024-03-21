@@ -7,6 +7,7 @@
 
 import Combine
 import Foundation
+import os
 
 import WallpaperKit
 
@@ -15,6 +16,8 @@ final class GlobalSettingsController: ObservableObject {
     private(set) var settings: GlobalSettings
     
     private let jsonEncoder = JSONEncoder()
+    
+    private let logger = Logger(subsystem: "com.haren724.wallpaper-player", category: "GlobalSettingsController")
     
     @Published var currentWallpapers: [GSDisplayIdentifier : any Wallpaper] = [:]
     

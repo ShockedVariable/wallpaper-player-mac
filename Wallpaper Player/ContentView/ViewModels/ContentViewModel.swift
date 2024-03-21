@@ -150,8 +150,6 @@ class ContentViewModel: ObservableObject, DropDelegate {
             }
             guard self.type.contains(type) else { return false }
             
-            // 
-            
             // Age Rating
             var ageRating: FRAgeRating
             switch wallpaper.project.contentrating {

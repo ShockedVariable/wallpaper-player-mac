@@ -318,8 +318,8 @@ struct ContentView: View {
                 .frame(width: 520, height: 450)
         }
         .sheet(isPresented: $viewModel.isUnsafeWallpaperWarningPresented) {
-            UnsafeWallpaper(wallpaper: wallpaperViewModel.nextCurrentWallpaper)
-                .frame(width: 600, height: 300)
+//            UnsafeWallpaper(wallpaper: wallpaperViewModel.nextCurrentWallpaper)
+//                .frame(width: 600, height: 300)
         }
     }
 }

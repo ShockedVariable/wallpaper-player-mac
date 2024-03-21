@@ -148,32 +148,32 @@ class GlobalSettingsViewModel: ObservableObject {
     }
     
     func didFinishLaunchingNotification() {
-        self.didActivateApplicationNotificationCancellable =
-        NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didActivateApplicationNotification)
-            .sink { [weak self] _ in self?.activateApplicationDidChange() }
-        
-        self.didChangeScreenParametersNotificationCancellable =
-        NotificationCenter.default.publisher(for: NSApplication.didChangeScreenParametersNotification)
-            .sink { [weak self] _ in self?.didChangeScreenParameters() }
-        
-        self.didCurrentWallpaperChangeCancellable =
-        AppDelegate.shared.wallpaperViewModel.$currentWallpaper
-            .sink { [weak self] in self?.didCurrentWallpaperChange($0) }
-        
-        self.didAddToLoginItemCancellable =
-        self.$settings
-            .removeDuplicates { $0.autoStart == $1.autoStart }
-            .map { $0.autoStart }
-            .sink { [weak self] in self?.didAddToLoginItem($0) }
-        
-        self.didChangeAdjustMenuBarTintCancellable =
-        self.$settings
-            .removeDuplicates { $0.adjustMenuBarTint == $1.adjustMenuBarTint }
-            .map { $0.adjustMenuBarTint }
-            .sink { [weak self] in self?.didChangeAdjustMenuBarTint($0) }
-            
-        
-        self.validate()
+//        self.didActivateApplicationNotificationCancellable =
+//        NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didActivateApplicationNotification)
+//            .sink { [weak self] _ in self?.activateApplicationDidChange() }
+//        
+//        self.didChangeScreenParametersNotificationCancellable =
+//        NotificationCenter.default.publisher(for: NSApplication.didChangeScreenParametersNotification)
+//            .sink { [weak self] _ in self?.didChangeScreenParameters() }
+//        
+//        self.didCurrentWallpaperChangeCancellable =
+//        AppDelegate.shared.wallpaperViewModel.$currentWallpaper
+//            .sink { [weak self] in self?.didCurrentWallpaperChange($0) }
+//        
+//        self.didAddToLoginItemCancellable =
+//        self.$settings
+//            .removeDuplicates { $0.autoStart == $1.autoStart }
+//            .map { $0.autoStart }
+//            .sink { [weak self] in self?.didAddToLoginItem($0) }
+//        
+//        self.didChangeAdjustMenuBarTintCancellable =
+//        self.$settings
+//            .removeDuplicates { $0.adjustMenuBarTint == $1.adjustMenuBarTint }
+//            .map { $0.adjustMenuBarTint }
+//            .sink { [weak self] in self?.didChangeAdjustMenuBarTint($0) }
+//            
+//        
+//        self.validate()
     }
     
     func didChangeScreenParameters() {
@@ -196,22 +196,22 @@ class GlobalSettingsViewModel: ObservableObject {
     }
     
     func didChangeAdjustMenuBarTint(_ newValue: Bool) {
-        if newValue != true {
-            if let wallpaper = UserDefaults.standard.url(forKey: "OSWallpaper") {
-                try? NSWorkspace.shared.setDesktopImageURL(wallpaper, for: .main!)
-            }
-        } else {
-            do {
-                let url = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appending(path: "staticWP_\(AppDelegate.shared.wallpaperViewModel.currentWallpaper.wallpaperDirectory.hashValue).tiff")
-                try NSWorkspace.shared.setDesktopImageURL(url, for: .main!)
-            } catch {
-                print(error)
-            }
-        }
+//        if newValue != true {
+//            if let wallpaper = UserDefaults.standard.url(forKey: "OSWallpaper") {
+//                try? NSWorkspace.shared.setDesktopImageURL(wallpaper, for: .main!)
+//            }
+//        } else {
+//            do {
+//                let url = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appending(path: "staticWP_\(AppDelegate.shared.wallpaperViewModel.currentWallpaper.wallpaperDirectory.hashValue).tiff")
+//                try NSWorkspace.shared.setDesktopImageURL(url, for: .main!)
+//            } catch {
+//                print(error)
+//            }
+//        }
     }
     
     func didCurrentWallpaperChange(_ newValue: WEWallpaper) {
-        AppDelegate.shared.setPlacehoderWallpaper(with: newValue)
+//        AppDelegate.shared.setPlacehoderWallpaper(with: newValue)
     }
     
     func reset() {
@@ -279,9 +279,11 @@ class GlobalSettingsViewModel: ObservableObject {
         default:
             switch self.settings.otherApplicationFocused {
             case .mute:
-                AppDelegate.shared.mute()
+//                AppDelegate.shared.mute()
+                    fallthrough
             case .pause:
-                AppDelegate.shared.pause()
+//                AppDelegate.shared.pause()
+                    fallthrough
             case .keepRunning:
                 fallthrough
             default:
@@ -293,9 +295,11 @@ class GlobalSettingsViewModel: ObservableObject {
     func globalSettingsWhenApplicationDidBecomeActive() {
         switch self.settings.otherApplicationFocused {
         case .mute:
-            AppDelegate.shared.unmute()
+//            AppDelegate.shared.unmute()
+                fallthrough
         case .pause:
-            AppDelegate.shared.resume()
+//            AppDelegate.shared.resume()
+                fallthrough
         case .keepRunning:
             fallthrough
         default:

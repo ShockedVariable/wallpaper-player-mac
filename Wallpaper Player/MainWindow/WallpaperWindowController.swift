@@ -14,10 +14,19 @@ final class WallpaperWindowController: NSWindowController {
     
     var windows = Set<NSWindowController>()
     
+    @Published var playbackStatus = PlaybackStatus.unknown
+    
     convenience init() {
         self.init(windowNibName: "")
     }
     
+    override func windowDidLoad() {
+        
+    }
+
+}
+
+extension WallpaperWindowController {
     override func loadWindow() {
         let window = NSWindow(contentRect: NSRect(origin: .zero,
                                                   size: CGSize(width: NSScreen.main!.visibleFrame.size.width,
@@ -42,21 +51,21 @@ final class WallpaperWindowController: NSWindowController {
         // And also can't be hidden
         window.canHide = false
         
-        self.window = window
-    }
-    
-    override func windowDidLoad() {
-        super.windowDidLoad()
-        
-        if let wallpaper = try? VideoWallpaper(contentsOf: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appending(path: "Chainsaw Man")) {
-            contentViewController = NSHostingController(rootView: VideoWallpaperViewWrapper(wallpaper: wallpaper))
+        if let wallpaper = VideoWallpaper(contentsOf: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appending(path: "Chainsaw Man")) {
+            let statusBinding = Binding<PlaybackStatus>(get: { [weak self] in
+                self?.playbackStatus ?? .unknown
+            }, set: { [weak self] (newValue: PlaybackStatus) in
+                self?.playbackStatus = newValue
+            })
+            contentViewController = NSHostingController(rootView: VideoWallpaperViewWrapper(wallpaper: wallpaper, status: statusBinding))
         }
         
-        window?.setFrame(NSRect(origin: .zero,
+        window.setFrame(NSRect(origin: .zero,
                                 
                                 size: CGSize(width: NSScreen.main!.visibleFrame.size.width,
                                              height: NSScreen.main!.visibleFrame.size.height + NSScreen.main!.visibleFrame.origin.y + 1)
                                ), display: true)
+        
+        self.window = window
     }
-
 }
