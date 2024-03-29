@@ -50,12 +50,6 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, Observab
         // View Controller
         window?.contentViewController = SplitViewController()
         
-        if let searchField = window?.contentView?.viewWithTag(NSLargeSearchField.className().hashValue) as? NSSearchField {
-            mainWindowSearchField = searchField
-        } else {
-            logger.error("SearchField not found! This weak property will be nil.")
-        }
-        
         windowFrameAutosaveName = "main-window"
     }
     
@@ -64,7 +58,7 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, Observab
     }
     
     @objc func performSearching(_ sender: Any?) {
-        if let searchField = mainWindowSearchField  {
+        if let searchField = NSApp.keyWindow?.contentView?.viewWithTag(NSLargeSearchField.className().hashValue) {
             window?.makeFirstResponder(searchField)
         } else {
             logger.error("SearchField not found! Find action will do nothing.")

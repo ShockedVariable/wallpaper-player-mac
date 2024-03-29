@@ -6,6 +6,7 @@
 //
 
 import Cocoa
+import Combine
 import SwiftUI
 import AVKit
 
@@ -90,5 +91,60 @@ struct VideoWallpaperView: NSViewRepresentable {
         
         viewModel.playRate = wallpaperViewModel.playRate
         viewModel.playVolume = wallpaperViewModel.playVolume
+    }
+}
+
+extension Legacy {
+    final class AVLoopPlayerItem: AVPlayerItem { }
+}
+
+extension Legacy {
+    struct VideoWallpaperView: NSViewRepresentable {
+        
+        var wallpaper: Wallpaper
+        
+        final class Coordinator {
+            var lastFile: URL?
+            
+            var looper: AVPlayerLooper?
+        }
+        
+//        private var loopPlaybackCancellable = NotificationCenter.default.publisher(for: AVPlayerItem.didPlayToEndTimeNotification)
+//            .sink { notification in
+//                (notification.object as? AVLoopPlayerItem)?.seek(to: .zero, completionHandler: nil)
+//            }
+        
+        func makeNSView(context: Context) -> AVPlayerView {
+            let view = AVPlayerView()
+            
+            view.player = AVQueuePlayer(items: [])
+            
+            // make the video boundary extends to fit the full screen without black background border
+            view.videoGravity = .resizeAspectFill
+            
+            // hide any unneeded ui component, we want just the video output
+            view.controlsStyle = .none
+            
+            // make sure this video player won't show any info in the system control center
+            view.updatesNowPlayingInfoCenter = false
+            
+            // mark the flag as unneeded, improve performance and reduce power drain
+            view.allowsVideoFrameAnalysis = false
+            
+            return view
+        }
+        
+        func updateNSView(_ nsView: AVPlayerView, context: Context) {
+            if wallpaper.file != context.coordinator.lastFile {
+                context.coordinator.looper = AVPlayerLooper(player: nsView.player as! AVQueuePlayer,
+                                                            templateItem: AVPlayerItem(url: wallpaper.file))
+                context.coordinator.lastFile = wallpaper.file
+            }
+            
+            nsView.player?.rate = wallpaper.settings.rate
+            nsView.player?.volume = wallpaper.settings.volume
+        }
+        
+        func makeCoordinator() -> Coordinator { Coordinator() }
     }
 }

@@ -32,7 +32,7 @@ extension NSMenu {
             NSMenuItem.separator()
             
             NSMenuItem(title: String(localized: "Settings..."),
-                       action: #selector(delegate.settingsWindowController.showWindow),
+                       action: #selector(delegate.settingsWindowController.showWindow(_:)),
                        keyEquivalent: ",")
             
             NSMenuItem.separator()

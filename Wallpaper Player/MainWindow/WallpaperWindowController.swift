@@ -12,20 +12,40 @@ import WallpaperKit
 
 final class WallpaperWindowController: NSWindowController {
     
+    /// Windows that each display monitor is occupied with.
     var windows = Set<NSWindowController>()
+    
+    var settings: Legacy.MultiDisplayController?
     
     @Published var playbackStatus = PlaybackStatus.unknown
     
     convenience init() {
+        self.init(multiDisplayController: nil)
+    }
+    
+    convenience init(multiDisplayController settings: Legacy.MultiDisplayController? = nil) {
         self.init(windowNibName: "")
+        self.settings = settings
     }
     
     override func windowDidLoad() {
+        let wallpaper = Legacy.Wallpaper(title: "【4K/60fps/Chainsaw Man】三鹰朝「愉快的悲伤结局」电锯人 战争恶魔 Mitaka Asa Yoru アサ",
+                                         settings: .init(rate: 1.0, volume: 1.0),
+                                         url: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appending(path: "Chainsaw Man"),
+                                         type: .video,
+                                         file: URL(filePath: "/Users/haren724/Library/Containers/com.haren724.wallpaper-player/Data/Documents/Chainsaw Man/test.mp4"))
+        contentViewController = NSHostingController(rootView: Legacy.WallpaperView(wallpaper: wallpaper))
         
+        window?.setFrame(NSRect(origin: .zero,
+                                
+                                size: CGSize(width: NSScreen.main!.visibleFrame.size.width,
+                                             height: NSScreen.main!.visibleFrame.size.height + NSScreen.main!.visibleFrame.origin.y + 1)
+                               ), display: true)
     }
-
+    
 }
 
+// MARK: - loadWindow
 extension WallpaperWindowController {
     override func loadWindow() {
         let window = NSWindow(contentRect: NSRect(origin: .zero,
@@ -50,21 +70,6 @@ extension WallpaperWindowController {
         
         // And also can't be hidden
         window.canHide = false
-        
-        if let wallpaper = VideoWallpaper(contentsOf: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appending(path: "Chainsaw Man")) {
-            let statusBinding = Binding<PlaybackStatus>(get: { [weak self] in
-                self?.playbackStatus ?? .unknown
-            }, set: { [weak self] (newValue: PlaybackStatus) in
-                self?.playbackStatus = newValue
-            })
-            contentViewController = NSHostingController(rootView: VideoWallpaperViewWrapper(wallpaper: wallpaper, status: statusBinding))
-        }
-        
-        window.setFrame(NSRect(origin: .zero,
-                                
-                                size: CGSize(width: NSScreen.main!.visibleFrame.size.width,
-                                             height: NSScreen.main!.visibleFrame.size.height + NSScreen.main!.visibleFrame.origin.y + 1)
-                               ), display: true)
         
         self.window = window
     }

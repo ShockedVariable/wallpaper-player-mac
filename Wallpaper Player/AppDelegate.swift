@@ -26,6 +26,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 //    private var globalSettingsController = GlobalSettingsController()
 //    
 //    private var systemWallpaperController = SystemWallpaperController()
+    let multiDisplayController = Legacy.MultiDisplayController()
     
     // Combine Cancellables
     var cancellable = Set<AnyCancellable>()
@@ -61,7 +62,7 @@ extension AppDelegate {
             NSMenuItem(submenu: NSApp.helpMenu!)
         }
         
-        // Showing main window and wallpaper window by default
+        // Showing main window and wallpaper window on launch
         mainWindowController.showWindow(self)
         wallpaperWindowController.showWindow(self)
     }

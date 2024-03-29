@@ -1,4 +1,8 @@
-1. 支持壁纸的筛选、搜索与排序了
-2. 减少不必要的动画，提升滚动性能
-3. 设置-插件中添加了开启与关闭预览动图的开关
-4. 增添了新的project.json文件格式的支持
+- [ ] Use WallpaperViewLegacy temporaily.
+- [ ] Playback control button and thumbnail preview in main window toolbar. (also volume)
+- [ ] Primary support of listing wallpapers' metadata in Inspector section.
+- [ ] Context menus and control buttons triggered in wallpapers explorer.
+- [ ] 2 layers of the highlighting border should be a **rounded** rectangle.
+- [ ] Search Field in side bar section. (Functionality)
+
+

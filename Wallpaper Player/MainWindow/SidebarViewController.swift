@@ -24,7 +24,6 @@ class SideBarViewController: NSHostingController<SideBarViewController.Content> 
         var body: some View {
             List(selection: $selection) {
                 SearchField("Search", text: $searchText)
-                    .keyboardShortcut("f", modifiers: .command)
 //                Section("Workshop") {
 //                    Label("Browse", systemImage: "square.grid.2x2").tag("browse")
 //                        .disabled(true)

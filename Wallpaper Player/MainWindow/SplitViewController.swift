@@ -26,26 +26,25 @@ class SplitViewController: NSSplitViewController {
     var contentItem:   NSSplitViewItem!
     var inspectorItem: NSSplitViewItem!
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
+    override func loadView() {
+        super.loadView()
         // Side Bar View
         sideBarItem = NSSplitViewItem(
             sidebarWithViewController: SideBarViewController()
         )
-        addSplitViewItem(sideBarItem)
+        insertSplitViewItem(sideBarItem, at: 0)
         
         // Content View
         contentItem = NSSplitViewItem(
             viewController: ContentViewController()
         )
-        addSplitViewItem(contentItem)
+        insertSplitViewItem(contentItem, at: 1)
         
         // Inspector View
         inspectorItem = NSSplitViewItem(
             inspectorWithViewController: InspectorViewController()
         )
-        addSplitViewItem(inspectorItem)
+        insertSplitViewItem(inspectorItem, at: 2)
         
         // Disallow the inspector to have full-height space
         inspectorItem.allowsFullHeightLayout = false
@@ -57,8 +56,12 @@ class SplitViewController: NSSplitViewController {
         //        inspectorItem.minimumThickness = 356
         
         splitView.autosaveName = "ContentSplitView"
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
         
-        self.inspectorItem.isCollapsed = false /// - Warning: Debug purpose, should be deleted when releasing
+        
     }
 }
 
