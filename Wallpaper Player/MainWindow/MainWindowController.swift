@@ -11,12 +11,17 @@ import SwiftUI
 
 final class MainWindowController: NSWindowController, NSWindowDelegate, ObservableObject {
     
+    // MARK: Weak Properties
     weak var multiDisplayToolbarItem: NSToolbarItem?
     weak var playbackToolbarItem: NSToolbarItem?
+    weak var volumeSliderToolbarItem: NSToolbarItem? { didSet { updateWallpaperCancellables() } }
     
     weak var mainWindowSearchField: NSSearchField?
     
-    weak var wallpaperWindowController: WallpaperWindowController?
+    weak var wallpaperWindowController: WallpaperWindowController? { didSet { updateWallpaperCancellables() } }
+    
+    private var wallpaperCancellables = Set<AnyCancellable>()
+    
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -32,19 +37,6 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, Observab
         
         NotificationCenter.default.publisher(for: NSApplication.didChangeScreenParametersNotification)
             .sink { [weak self] _ in self?.updateDisplayPickerData() }
-            .store(in: &cancellables)
-        
-        $playbackStatus
-            .sink { [weak self] status in
-                switch status {
-                    case .playing:
-                        self?.playbackToolbarItem?.image = NSImage(systemSymbolName: "pause.fill", accessibilityDescription: nil)
-                    case .paused:
-                        self?.playbackToolbarItem?.image = NSImage(systemSymbolName: "play.fill", accessibilityDescription: nil)
-                    case .unknown:
-                        self?.playbackToolbarItem?.image = NSImage(systemSymbolName: "play.slash.fill", accessibilityDescription: nil)
-                }
-            }
             .store(in: &cancellables)
         
         // View Controller
@@ -93,14 +85,7 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, Observab
     
     @objc func togglePlayback() {
         if let wallpaperWindowController = wallpaperWindowController {
-            switch wallpaperWindowController.playbackStatus {
-                case .playing:
-                    wallpaperWindowController.playbackStatus = .paused
-                case .paused:
-                    wallpaperWindowController.playbackStatus = .playing
-                case .unknown:
-                    break
-            }
+            wallpaperWindowController.wallpaper.settings.paused.toggle()
         } else {
             logger.error("Toggle playback status failed! Cannot find wallpaperWindowController binding.")
         }
@@ -113,9 +98,10 @@ extension MainWindowController: NSToolbarDelegate {
         [
             .toggleSidebar,
             .multiDisplayPicker,
-                .playbackButton,
+            .playbackButton,
             .playingInfo,
             .togglePreview,
+            .volumeSlider,
             .space,
             .flexibleSpace,
             .sidebarTrackingSeparator
@@ -123,7 +109,16 @@ extension MainWindowController: NSToolbarDelegate {
     }
     
     func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        [.toggleSidebar, .sidebarTrackingSeparator, .multiDisplayPicker, .playbackButton, .flexibleSpace, .togglePreview]
+        [
+            .toggleSidebar,
+            .sidebarTrackingSeparator, 
+            .multiDisplayPicker,
+            .playbackButton,
+            .flexibleSpace,
+            .volumeSlider,
+            .space,
+            .togglePreview
+        ]
     }
     
     func toolbarSelectableItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
@@ -153,15 +148,45 @@ extension MainWindowController: NSToolbarDelegate {
                 toolbarItem.isBordered = true
                 toolbarItem.action = #selector(togglePlayback)
                 playbackToolbarItem = toolbarItem
-            default:
-                break
+            case .volumeSlider:
+                toolbarItem.view = NSHostingView(rootView: VolumeSlider())
+                toolbarItem.isBordered = true
+                volumeSliderToolbarItem = toolbarItem
+            case let item:
+                print("Unsupport toolbar item: \"\(item.rawValue)\"")
         }
         
         return toolbarItem
     }
 }
 
+struct VolumeSlider: View {
+    
+    @State private var volume: Float = 1.0
+    
+    var body: some View {
+        Slider(value: $volume, in: 0.0...1.0) {
+            Text("Volume")
+        } minimumValueLabel: {
+            Image(systemName: "speaker.fill")
+        } maximumValueLabel: {
+            Image(systemName: "speaker.3.fill")
+        }
+        .controlSize(.small)
+        .labelsHidden()
+        .tint(.secondary)
+        .frame(minWidth: 120, minHeight: 40)
+        
+    }
+}
 
+#Preview {
+    VolumeSlider()
+        .padding()
+        .frame(width: 160, height: 80)
+}
+
+// MARK: - loadWindow
 extension MainWindowController {
     override func loadWindow() {
         let window = NSWindow(contentRect: .zero,
@@ -202,4 +227,20 @@ extension NSToolbarItem.Identifier {
     public static let playbackButton = Self.init("playback-button")
     public static let playingInfo = Self.init("playing-info")
     public static let togglePreview = Self.init("preview-toggle")
+    public static let volumeSlider = Self.init("volume-slider")
+}
+
+extension MainWindowController {
+    @inline(__always) func updateWallpaperCancellables() {
+        wallpaperCancellables.removeAll()
+        wallpaperWindowController?.$wallpaper
+            .sink { [weak self] wallpaper in
+                if wallpaper.settings.paused {
+                    self?.playbackToolbarItem?.image = NSImage(systemSymbolName: "play.fill", accessibilityDescription: nil)
+                } else {
+                    self?.playbackToolbarItem?.image = NSImage(systemSymbolName: "pause.fill", accessibilityDescription: nil)
+                }
+            }
+            .store(in: &wallpaperCancellables)
+    }
 }

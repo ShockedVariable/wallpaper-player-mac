@@ -11,8 +11,9 @@ import SwiftUI
 
 extension Legacy {
     struct PlaybackStatus {
-        var rate: Float
-        var volume: Float
+        var rate: Float = 1.0
+        var volume: Float = 1.0
+        var paused: Bool = false
     }
 }
 
@@ -20,6 +21,7 @@ extension Legacy {
 /// - Parameter url: The URL which wallpaper is located at.
 extension Legacy {
     struct WallpaperView: View {
+        
         var wallpaper: Wallpaper
         
         var body: some View {

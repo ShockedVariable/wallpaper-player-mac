@@ -141,7 +141,12 @@ extension Legacy {
                 context.coordinator.lastFile = wallpaper.file
             }
             
-            nsView.player?.rate = wallpaper.settings.rate
+            if wallpaper.settings.paused {
+                nsView.player?.rate = 0
+            } else {
+                nsView.player?.rate = wallpaper.settings.rate
+            }
+            
             nsView.player?.volume = wallpaper.settings.volume
         }
         

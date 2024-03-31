@@ -6,6 +6,7 @@
 //
 
 import Cocoa
+import Combine
 import SwiftUI
 
 import WallpaperKit
@@ -15,9 +16,17 @@ final class WallpaperWindowController: NSWindowController {
     /// Windows that each display monitor is occupied with.
     var windows = Set<NSWindowController>()
     
+    private var cancellables = Set<AnyCancellable>()
+    
     var settings: Legacy.MultiDisplayController?
     
     @Published var playbackStatus = PlaybackStatus.unknown
+    
+    @Published var wallpaper: Legacy.Wallpaper = Legacy.Wallpaper(title: "【4K/60fps/Chainsaw Man】三鹰朝「愉快的悲伤结局」电锯人 战争恶魔 Mitaka Asa Yoru アサ",
+                                                       settings: .init(rate: 1.0, volume: 1.0),
+                                                       url: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appending(path: "Chainsaw Man"),
+                                                       type: .video,
+                                                       file: URL(filePath: "/Users/haren724/Library/Containers/com.haren724.wallpaper-player/Data/Documents/3012918464/小羊.mp4"))
     
     convenience init() {
         self.init(multiDisplayController: nil)
@@ -29,15 +38,16 @@ final class WallpaperWindowController: NSWindowController {
     }
     
     override func windowDidLoad() {
-        let wallpaper = Legacy.Wallpaper(title: "【4K/60fps/Chainsaw Man】三鹰朝「愉快的悲伤结局」电锯人 战争恶魔 Mitaka Asa Yoru アサ",
-                                         settings: .init(rate: 1.0, volume: 1.0),
-                                         url: FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appending(path: "Chainsaw Man"),
-                                         type: .video,
-                                         file: URL(filePath: "/Users/haren724/Library/Containers/com.haren724.wallpaper-player/Data/Documents/Chainsaw Man/test.mp4"))
         contentViewController = NSHostingController(rootView: Legacy.WallpaperView(wallpaper: wallpaper))
         
+        $wallpaper
+            .dropFirst()
+            .sink { [weak self] wallpaper in
+                (self?.contentViewController as? NSHostingController)?.rootView = Legacy.WallpaperView(wallpaper: wallpaper)
+            }
+            .store(in: &cancellables)
+        
         window?.setFrame(NSRect(origin: .zero,
-                                
                                 size: CGSize(width: NSScreen.main!.visibleFrame.size.width,
                                              height: NSScreen.main!.visibleFrame.size.height + NSScreen.main!.visibleFrame.origin.y + 1)
                                ), display: true)
