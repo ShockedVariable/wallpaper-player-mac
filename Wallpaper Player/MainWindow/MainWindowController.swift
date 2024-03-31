@@ -149,7 +149,7 @@ extension MainWindowController: NSToolbarDelegate {
                 toolbarItem.action = #selector(togglePlayback)
                 playbackToolbarItem = toolbarItem
             case .volumeSlider:
-                toolbarItem.view = NSHostingView(rootView: VolumeSlider())
+                toolbarItem.view = NSHostingView(rootView: VolumeSlider(volume: .constant(0.0))) // Fix Value
                 toolbarItem.isBordered = true
                 volumeSliderToolbarItem = toolbarItem
             case let item:
@@ -162,7 +162,7 @@ extension MainWindowController: NSToolbarDelegate {
 
 struct VolumeSlider: View {
     
-    @State private var volume: Float = 1.0
+    @Binding var volume: Float
     
     var body: some View {
         Slider(value: $volume, in: 0.0...1.0) {
@@ -181,7 +181,7 @@ struct VolumeSlider: View {
 }
 
 #Preview {
-    VolumeSlider()
+    VolumeSlider(volume: .constant(1.0))
         .padding()
         .frame(width: 160, height: 80)
 }
@@ -230,9 +230,14 @@ extension NSToolbarItem.Identifier {
     public static let volumeSlider = Self.init("volume-slider")
 }
 
+// MARK: - updateWallpaperCancellables
 extension MainWindowController {
     @inline(__always) func updateWallpaperCancellables() {
+        
+        // Release Previous Cancellable Subscriptions
         wallpaperCancellables.removeAll()
+        
+        // MARK: Playback Toolbar Item
         wallpaperWindowController?.$wallpaper
             .sink { [weak self] wallpaper in
                 if wallpaper.settings.paused {
@@ -240,6 +245,18 @@ extension MainWindowController {
                 } else {
                     self?.playbackToolbarItem?.image = NSImage(systemSymbolName: "pause.fill", accessibilityDescription: nil)
                 }
+            }
+            .store(in: &wallpaperCancellables)
+        
+        // MARK: Volume Slider
+        wallpaperWindowController?.$wallpaper
+            .sink { [weak self] wallpaper in
+                (self?.volumeSliderToolbarItem?.view as? NSHostingView)?.rootView =
+                VolumeSlider(volume: Binding<Float> {
+                    wallpaper.settings.volume
+                } set: { newVolume in
+                    self?.wallpaperWindowController?.wallpaper.settings.volume = newVolume
+                })
             }
             .store(in: &wallpaperCancellables)
     }
