@@ -30,6 +30,8 @@ struct SettingsView: View {
                 GeneralPage(globalSettings: viewModel)
             case .plugins:
                 PluginsPage(globalSettings: viewModel)
+            case .privacy:
+                PrivacyPage()
             case .about:
                 AboutUsView()
             }

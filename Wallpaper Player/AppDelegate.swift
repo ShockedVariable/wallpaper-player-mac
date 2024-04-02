@@ -34,15 +34,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // Combine Cancellables
     var cancellable = Set<AnyCancellable>()
     
+    var noNecessaryWindows: Bool {
+        if let mainWindow = mainWindowController.window,
+           let settingsWindow = settingsWindowController.window,
+           mainWindow.isVisible || settingsWindow.isVisible {
+            return false
+        } else {
+            return true
+        }
+    }
+    
     func applicationDidBecomeActive(_ notification: Notification) {
-        if NSApp.keyWindow == nil {
-            mainWindowController.showWindow(self)
+        NSApp.setActivationPolicy(.regular)
+    }
+    
+    func applicationDidResignActive(_ notification: Notification) {
+        if noNecessaryWindows {
+            NSApp.setActivationPolicy(.accessory)
         }
     }
     
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        if NSApp.keyWindow == nil {
+        if noNecessaryWindows {
             mainWindowController.showWindow(self)
+        } else {
+            NSApp.activate(ignoringOtherApps: false)
         }
         return true
     }

@@ -30,11 +30,11 @@ class SettingsWindowController: NSWindowController, NSToolbarDelegate, NSWindowD
     
     override func loadWindow() {
         let window = NSWindow(contentRect: .zero,
-                             styleMask: [.titled,
-                                         .closable,
-                                         .fullSizeContentView],
-                             backing: .buffered,
-                             defer: false)
+                              styleMask: [.titled,
+                                          .closable,
+                                          .fullSizeContentView],
+                              backing: .buffered,
+                              defer: false)
         
         window.delegate = self
         window.title = "Settings"
@@ -59,6 +59,9 @@ class SettingsWindowController: NSWindowController, NSToolbarDelegate, NSWindowD
     }
     
     override func showWindow(_ sender: Any?) {
+        if NSApp.activationPolicy() == .accessory {
+            NSApp.activate(ignoringOtherApps: true)
+        }
         if let window = window, window.isVisible {
             super.showWindow(sender)
         } else {
@@ -78,50 +81,51 @@ extension SettingsWindowController {
     
     func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
         let toolbarItem = NSToolbarItem(itemIdentifier: itemIdentifier)
+        toolbarItem.action = #selector(switchTabSelection(_:))
         
         switch itemIdentifier {
-            
-        case .settingsPerformance:
-            toolbarItem.label = "Performance"
-            toolbarItem.image = NSImage(systemSymbolName: "gauge.open.with.lines.needle.33percent", accessibilityDescription: nil)
-            toolbarItem.tag = SettingsTabSelestion.performance.rawValue
-            toolbarItem.action = #selector(switchTabSelection(_:))
-            
-        case .settingsGeneral:
-            toolbarItem.label = "General"
-            toolbarItem.image = NSImage(systemSymbolName: "gearshape", accessibilityDescription: nil)
-            toolbarItem.tag = SettingsTabSelestion.general.rawValue
-            toolbarItem.action = #selector(switchTabSelection(_:))
-            
-        case .settingsPlugins:
-            toolbarItem.label = "Plugins"
-            toolbarItem.image = NSImage(systemSymbolName: "puzzlepiece.extension", accessibilityDescription: nil)
-            toolbarItem.tag = SettingsTabSelestion.plugins.rawValue
-            toolbarItem.action = #selector(switchTabSelection(_:))
-            
-        case .settingsAbout:
-            toolbarItem.label = "About"
-            toolbarItem.image = NSImage(systemSymbolName: "person.3", accessibilityDescription: nil)
-            toolbarItem.tag = SettingsTabSelestion.about.rawValue
-            toolbarItem.action = #selector(switchTabSelection(_:))
-            
-        default:
-            fatalError("Invalid Settings Toolbar Item!")
+            case .settingsPerformance:
+                toolbarItem.label = "Performance"
+                toolbarItem.image = NSImage(systemSymbolName: "gauge.open.with.lines.needle.33percent", accessibilityDescription: nil)
+                toolbarItem.tag = SettingsTabSelestion.performance.rawValue
+                
+            case .settingsPrivacy:
+                toolbarItem.label = "Privacy"
+                toolbarItem.image = NSImage(systemSymbolName: "hand.raised", accessibilityDescription: nil)
+                toolbarItem.tag = SettingsTabSelestion.privacy.rawValue
+                
+            case .settingsGeneral:
+                toolbarItem.label = "General"
+                toolbarItem.image = NSImage(systemSymbolName: "gearshape", accessibilityDescription: nil)
+                toolbarItem.tag = SettingsTabSelestion.general.rawValue
+                
+            case .settingsPlugins:
+                toolbarItem.label = "Plugins"
+                toolbarItem.image = NSImage(systemSymbolName: "puzzlepiece.extension", accessibilityDescription: nil)
+                toolbarItem.tag = SettingsTabSelestion.plugins.rawValue
+                
+            case .settingsAbout:
+                toolbarItem.label = "About"
+                toolbarItem.image = NSImage(systemSymbolName: "person.3", accessibilityDescription: nil)
+                toolbarItem.tag = SettingsTabSelestion.about.rawValue
+                
+            default:
+                fatalError("Invalid Settings Toolbar Item!")
         }
         
         return toolbarItem
     }
     
     func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        [.settingsAbout, .settingsGeneral, .settingsPlugins, .settingsPerformance]
+        [.settingsAbout, .settingsGeneral, .settingsPlugins, .settingsPerformance, .settingsPrivacy]
     }
     
     func toolbarSelectableItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        [.settingsAbout, .settingsGeneral, .settingsPlugins, .settingsPerformance]
+        [.settingsAbout, .settingsGeneral, .settingsPlugins, .settingsPerformance, .settingsPrivacy]
     }
     
     func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        [.settingsPerformance, .settingsGeneral, .settingsPlugins, .settingsAbout]
+        [.settingsPerformance, .settingsGeneral, .settingsPlugins, .settingsPrivacy, .settingsAbout]
     }
 }
 
@@ -130,8 +134,9 @@ extension NSToolbarItem.Identifier {
     static let settingsGeneral = Self.init("settings-general")
     static let settingsPlugins = Self.init("settings-plugins")
     static let settingsAbout = Self.init("settings-about")
+    static let settingsPrivacy = Self.init("settings-privacy")
 }
 
 enum SettingsTabSelestion: Int {
-    case performance, general, plugins, about
+    case performance, general, plugins, about, privacy
 }

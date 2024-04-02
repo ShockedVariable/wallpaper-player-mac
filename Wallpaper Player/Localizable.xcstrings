@@ -198,6 +198,9 @@
     "About Wallpaper Player" : {
 
     },
+    "Accessibility" : {
+
+    },
     "Add to Favorites" : {
       "localizations" : {
         "zh-Hans" : {
@@ -477,6 +480,9 @@
           }
         }
       }
+    },
+    "Close and reopen this app to make your settings take effect." : {
+
     },
     "Close Window" : {
       "extractionState" : "stale",
@@ -954,6 +960,9 @@
         }
       }
     },
+    "Input Monitoring" : {
+
+    },
     "Installed" : {
       "localizations" : {
         "zh-Hans" : {
@@ -963,6 +972,12 @@
           }
         }
       }
+    },
+    "Interact with supported wallpapers. Requires system accessbility permission." : {
+
+    },
+    "Interact with supported wallpapers. Requires system input monitoring permission." : {
+
     },
     "Internal" : {
 
@@ -1050,6 +1065,12 @@
           }
         }
       }
+    },
+    "Location: System Settings - Privacy & Security - Accessibility" : {
+
+    },
+    "Location: System Settings - Privacy & Security - Input Monitoring" : {
+
     },
     "Log Level" : {
       "localizations" : {
@@ -1411,6 +1432,9 @@
           }
         }
       }
+    },
+    "Per-Wallpaper Settings" : {
+
     },
     "Performance" : {
       "extractionState" : "manual",

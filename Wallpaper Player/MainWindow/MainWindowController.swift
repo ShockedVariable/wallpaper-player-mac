@@ -28,6 +28,13 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, Observab
         self.init(windowNibName: "")
     }
     
+    override func showWindow(_ sender: Any?) {
+        if NSApp.activationPolicy() == .accessory {
+            NSApp.activate(ignoringOtherApps: true)
+        }
+        super.showWindow(sender)
+    }
+    
     // MARK: windowDidLoad
     override func windowDidLoad() {
         NotificationCenter.default.publisher(for: NSApplication.didChangeScreenParametersNotification)

@@ -26,7 +26,7 @@ extension NSMenu {
     static func appMenu(delegate: AppDelegate) -> NSMenu {
         NSMenu(title: "Wallpaper Player") {
             NSMenuItem(title: String(localized: "About Wallpaper Player"),
-                       action: #selector(delegate.showAboutUs),
+                       action: #selector(NSApp.orderFrontStandardAboutPanel(_:)),
                        keyEquivalent: "")
             
             NSMenuItem.separator()
