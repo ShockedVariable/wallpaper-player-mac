@@ -37,7 +37,7 @@ struct WallpaperExplorer: SubviewOfContentView {
                 .padding(.top, 50)
             } else {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: viewModel.explorerIconSize,
-                                                       maximum: viewModel.explorerIconSize * 1.5))],
+                                                       maximum: viewModel.explorerIconSize + 50))],
                           alignment: .center, spacing: 20) {
                     ForEach(Array(viewModel.autoRefreshWallpapers.enumerated()), id: \.0) { (index, wallpaper) in
                         ExplorerItem(viewModel: viewModel, wallpaperViewModel: wallpaperViewModel, wallpaper: wallpaper, index: index)

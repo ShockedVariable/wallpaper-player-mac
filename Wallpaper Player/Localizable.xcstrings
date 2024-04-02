@@ -425,6 +425,7 @@
       }
     },
     "Browse Workshop" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -819,6 +820,9 @@
       }
     },
     "haren724" : {
+
+    },
+    "haren724123123" : {
 
     },
     "Hello" : {
@@ -1609,6 +1613,7 @@
       }
     },
     "Recent Wallpapers" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1901,9 +1906,6 @@
         }
       }
     },
-    "Show Wallpaper Player" : {
-
-    },
     "Similar UI Layout to Wallpaper Engine on Steam" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1989,6 +1991,7 @@
       }
     },
     "Support & FAQ" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {

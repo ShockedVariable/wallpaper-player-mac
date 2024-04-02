@@ -27,9 +27,9 @@ struct ExplorerGlobalMenu: SubviewOfContentView {
             Menu("View") {
                 Section {
                     Picker("Icon Size", selection: $viewModel.explorerIconSize) {
-                        Text("Small Icons").tag(Double(100))
-                        Text("Medium Icons").tag(Double(125))
-                        Text("Large Icons").tag(Double(150))
+                        Text("Small Icons").tag(Double(150))
+                        Text("Medium Icons").tag(Double(200))
+                        Text("Large Icons").tag(Double(250))
                     }
                     .pickerStyle(.inline)
                 }

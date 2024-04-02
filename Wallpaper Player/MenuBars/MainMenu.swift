@@ -31,7 +31,8 @@ extension NSMenu {
             
             NSMenuItem.separator()
             
-            NSMenuItem(title: String(localized: "Settings..."),
+            NSMenuItem(localizedTitle: String(localized: "Settings..."),
+                       target: delegate.settingsWindowController,
                        action: #selector(delegate.settingsWindowController.showWindow(_:)),
                        keyEquivalent: ",")
             
@@ -93,32 +94,22 @@ extension NSMenu {
     static func helpMenu(delegate: AppDelegate) -> NSMenu {
         NSMenu(title: "Help")
     }
-    
-//    @objc func performSearch
 }
 
 extension NSMenuItem {
-    
     convenience init(submenu: NSMenu) {
         self.init()
         self.submenu = submenu
     }
-    //
-    //    static func appMenuItem(appMenu: NSMenu) -> NSMenuItem { NSMenuItem(submenu: appMenu) }
-    //
-    //    static func windowsMenuItem(windowsMenu: NSMenu) -> NSMenuItem { NSMenuItem(submenu: windowsMenu) }
-}
-
-extension AppDelegate {
-    
-    @objc func openMainWindow(_ sender: Any?) {
-        mainWindowController.showWindow(sender)
-    }
 }
 
 extension NSMenuItem {
-    convenience init(localizedTitle: String, action: Selector? = nil, keyEquivalent: String, modifierMask: NSEvent.ModifierFlags? = nil) {
+    convenience init(localizedTitle: String, systemImage systemSymbolName: String? = nil, target: Any? = nil, action: Selector? = nil, keyEquivalent: String, modifierMask: NSEvent.ModifierFlags? = nil) {
         self.init(title: String(localized: .init(localizedTitle)), action: action, keyEquivalent: keyEquivalent)
+        self.target = target as AnyObject?
+        if let systemSymbolName = systemSymbolName {
+            self.image = NSImage(systemSymbolName: systemSymbolName, accessibilityDescription: nil)
+        }
         if let modifierMask = modifierMask {
             self.keyEquivalentModifierMask = modifierMask
         }

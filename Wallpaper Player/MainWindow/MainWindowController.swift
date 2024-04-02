@@ -14,39 +14,53 @@ final class MainWindowController: NSWindowController, NSWindowDelegate, Observab
     // MARK: Weak Properties
     weak var multiDisplayToolbarItem: NSToolbarItem?
     weak var playbackToolbarItem: NSToolbarItem?
-    weak var volumeSliderToolbarItem: NSToolbarItem? { didSet { updateWallpaperCancellables() } }
+    weak var volumeSliderToolbarItem: NSToolbarItem?
     
     weak var mainWindowSearchField: NSSearchField?
     
-    weak var wallpaperWindowController: WallpaperWindowController? { didSet { updateWallpaperCancellables() } }
-    
-    private var wallpaperCancellables = Set<AnyCancellable>()
-    
+    weak var wallpaperWindowController: WallpaperWindowController?
     
     private var cancellables = Set<AnyCancellable>()
     
     private let logger = Logger(subsystem: "com.haren724.wallpaper-player", category: className())
     
-    @Published var playbackStatus = PlaybackStatus.unknown
-    
-    convenience init() { self.init(windowNibName: "") }
+    convenience init() {
+        self.init(windowNibName: "")
+    }
     
     // MARK: windowDidLoad
     override func windowDidLoad() {
-        super.windowDidLoad()
-        
         NotificationCenter.default.publisher(for: NSApplication.didChangeScreenParametersNotification)
             .sink { [weak self] _ in self?.updateDisplayPickerData() }
+            .store(in: &cancellables)
+        
+        // MARK: Playback Toolbar Item
+        wallpaperWindowController?.$wallpaper
+            .sink { [weak self] wallpaper in
+                if wallpaper.settings.paused {
+                    self?.playbackToolbarItem?.image = NSImage(systemSymbolName: "play.fill", accessibilityDescription: nil)
+                } else {
+                    self?.playbackToolbarItem?.image = NSImage(systemSymbolName: "pause.fill", accessibilityDescription: nil)
+                }
+            }
+            .store(in: &cancellables)
+        
+        // MARK: Volume Slider
+        wallpaperWindowController?.$wallpaper
+            .sink { [weak self] wallpaper in
+                (self?.volumeSliderToolbarItem?.view as? NSHostingView)?.rootView =
+                VolumeSlider(volume: Binding<Float> {
+                    wallpaper.settings.volume
+                } set: { newVolume in
+                    self?.wallpaperWindowController?.wallpaper.settings.volume = newVolume
+                })
+            }
             .store(in: &cancellables)
         
         // View Controller
         window?.contentViewController = SplitViewController()
         
         windowFrameAutosaveName = "main-window"
-    }
-    
-    @inline(__always) func binding() {
-        
     }
     
     @objc func performSearching(_ sender: Any?) {
@@ -115,6 +129,8 @@ extension MainWindowController: NSToolbarDelegate {
             .multiDisplayPicker,
             .playbackButton,
             .flexibleSpace,
+            .playingInfo,
+            .flexibleSpace,
             .volumeSlider,
             .space,
             .togglePreview
@@ -152,12 +168,57 @@ extension MainWindowController: NSToolbarDelegate {
                 toolbarItem.view = NSHostingView(rootView: VolumeSlider(volume: .constant(0.0))) // Fix Value
                 toolbarItem.isBordered = true
                 volumeSliderToolbarItem = toolbarItem
+            case .playingInfo:
+                toolbarItem.view = NSHostingView(rootView: PlayingInfo(wallpaper: wallpaperWindowController?.wallpaper))
+                toolbarItem.isBordered = true
+                
             case let item:
                 print("Unsupport toolbar item: \"\(item.rawValue)\"")
         }
         
         return toolbarItem
     }
+}
+
+struct PlayingInfo: View {
+    
+    var wallpaper: Legacy.Wallpaper?
+    
+    private let barHeight: CGFloat = 40.0
+    
+    var body: some View {
+        HStack(spacing: 0) {
+            Group {
+                if let wallpaper = wallpaper {
+                    GifImage(contentsOf: wallpaper.file.deletingLastPathComponent().appending(path: "preview.jpg"))
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                } else {
+                    Image(systemName: "questionmark")
+                }
+            }
+            .frame(width: barHeight, height: barHeight)
+            VStack {
+                VStack {
+                    Text(wallpaper?.title ?? "Loading...")
+                    Text("haren724123123")
+                        .foregroundStyle(.secondary)
+                }
+                .font(.subheadline)
+                .padding(.horizontal)
+                
+            }
+            .frame(minWidth: 20, maxHeight: .infinity)
+            .background(.regularMaterial)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 4.0))
+        .frame(height: barHeight)
+    }
+}
+
+#Preview {
+    PlayingInfo()
+        .padding()
 }
 
 struct VolumeSlider: View {
@@ -228,36 +289,4 @@ extension NSToolbarItem.Identifier {
     public static let playingInfo = Self.init("playing-info")
     public static let togglePreview = Self.init("preview-toggle")
     public static let volumeSlider = Self.init("volume-slider")
-}
-
-// MARK: - updateWallpaperCancellables
-extension MainWindowController {
-    @inline(__always) func updateWallpaperCancellables() {
-        
-        // Release Previous Cancellable Subscriptions
-        wallpaperCancellables.removeAll()
-        
-        // MARK: Playback Toolbar Item
-        wallpaperWindowController?.$wallpaper
-            .sink { [weak self] wallpaper in
-                if wallpaper.settings.paused {
-                    self?.playbackToolbarItem?.image = NSImage(systemSymbolName: "play.fill", accessibilityDescription: nil)
-                } else {
-                    self?.playbackToolbarItem?.image = NSImage(systemSymbolName: "pause.fill", accessibilityDescription: nil)
-                }
-            }
-            .store(in: &wallpaperCancellables)
-        
-        // MARK: Volume Slider
-        wallpaperWindowController?.$wallpaper
-            .sink { [weak self] wallpaper in
-                (self?.volumeSliderToolbarItem?.view as? NSHostingView)?.rootView =
-                VolumeSlider(volume: Binding<Float> {
-                    wallpaper.settings.volume
-                } set: { newVolume in
-                    self?.wallpaperWindowController?.wallpaper.settings.volume = newVolume
-                })
-            }
-            .store(in: &wallpaperCancellables)
-    }
 }

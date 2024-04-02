@@ -1,8 +1,7 @@
-- [ ] Use WallpaperViewLegacy temporaily.
-- [ ] Playback control button and thumbnail preview in main window toolbar. (also volume)
+- [ ] Use WallpaperViewLegacy temporaily. (also web wallpaper)
+- [x] Playback control button and thumbnail preview in main window toolbar. (also volume)
 - [ ] Primary support of listing wallpapers' metadata in Inspector section.
 - [ ] Context menus and control buttons triggered in wallpapers explorer.
 - [ ] 2 layers of the highlighting border should be a **rounded** rectangle.
 - [ ] Search Field in side bar section. (Functionality)
-
 
